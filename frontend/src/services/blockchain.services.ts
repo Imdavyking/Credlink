@@ -3,6 +3,7 @@ import {
   getAccount,
   getFunction,
   publicClient,
+  umixInterface,
   walletClient,
 } from "../utils/config";
 
@@ -103,7 +104,8 @@ export const createLoan = async ({
     data,
     value,
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+  const tx = await publicClient().waitForTransactionReceipt({ hash });
+  revertOnError(tx);
 };
 
 export const acceptLoan = async ({
@@ -135,7 +137,9 @@ export const acceptLoan = async ({
     to,
     data,
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+
+  const tx = await publicClient().waitForTransactionReceipt({ hash });
+  revertOnError(tx);
 };
 
 export const payLoan = async ({
@@ -165,7 +169,9 @@ export const payLoan = async ({
     data,
     value,
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+
+  const tx = await publicClient().waitForTransactionReceipt({ hash });
+  revertOnError(tx);
 };
 
 export const lockCollateral = async ({
@@ -194,5 +200,32 @@ export const lockCollateral = async ({
     data,
     value,
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+  const tx = await publicClient().waitForTransactionReceipt({ hash });
+  revertOnError(tx);
+};
+
+const revertOnError = (tx: any) => {
+  try {
+    console.log(tx);
+    if (!tx || !tx.status) {
+      throw new Error("Transaction receipt is not available or invalid");
+    }
+    if (tx.status === "reverted") {
+      const errorData = tx.logs[0]?.data;
+      const errorMessage =
+        errorData || "Transaction reverted without a message";
+      if (errorData) {
+        const fragment = umixInterface.fragments.filter((fragment) => {
+          return fragment.type === "error";
+        });
+        console.log({ fragments: fragment });
+        console.log(umixInterface.parseError(errorData));
+      }
+      throw new Error(`Transaction failed: ${errorMessage}`);
+    }
+    return tx;
+  } catch (error) {
+    console.error("Error occurred:", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
 };

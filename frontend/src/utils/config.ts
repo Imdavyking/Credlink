@@ -10,6 +10,8 @@ import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
 import abi from "../assets/json/umix.json";
 import { CONTRACT_ADDRESS } from "./constants";
 
+export const umixInterface = new ethers.Interface(abi);
+
 const bcs = new BCS(getRustConfig());
 bcs.registerEnumType("SerializableTransactionData", {
   EoaBaseTokenTransfer: "",
@@ -63,7 +65,7 @@ export const walletClient = () =>
   }).extend(walletActionsL2());
 
 export const getFunction = async (name: string, ...args: any[]) => {
-  const contract = new ethers.Contract(CONTRACT_ADDRESS, abi);
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, umixInterface);
   const fn = contract.getFunction(name);
   if (!fn) throw new Error(`Function "${name}" not found in ABI`);
 
