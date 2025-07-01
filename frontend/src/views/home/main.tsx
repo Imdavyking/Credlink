@@ -109,3 +109,5 @@ export default function Home() {
     </div>
   );
 }
+
+// make loan in hours
