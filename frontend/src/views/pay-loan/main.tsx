@@ -4,14 +4,13 @@ import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
-import { useWallet } from "../../context/WalletContext";
 import {
   getDebt,
   getUserBalance,
   payLoan,
 } from "../../services/blockchain.services";
 import { toast } from "react-toastify";
-import { ss58ToH160 } from "../../utils/helpers";
+import { getAccount } from "../../utils/config";
 
 interface Token {
   name: string;
@@ -26,15 +25,23 @@ export default function PayLoan() {
   const [balance, setBalance] = useState("");
   const [lender, setLender] = useState("");
   const [debt, setDebt] = useState("");
-  const { account } = useWallet();
+  const [account, setAccount] = useState<`0x${string}` | null>(null);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      const account = await getAccount();
+      if (!account) return;
+      setAccount(account as `0x${string}`);
+    };
+    fetchAccount();
+  }, []);
 
   useEffect(() => {
     const fetchDebt = async () => {
       if (!account) return;
       const debt = await getDebt({
-        borrower: ss58ToH160(account.address).asHex(),
-        token: selectedLoanToken.address,
-        account,
+        borrower: account,
+        token: selectedLoanToken.address as `0x${string}`,
       });
       if (typeof debt === "undefined") {
         console.log("collateral is undefined");
@@ -49,11 +56,14 @@ export default function PayLoan() {
     (async () => {
       if (!account) return;
 
-      setLender(ss58ToH160(account.address).asHex());
+      setLender(account);
 
       if (lender === "") return;
 
-      const balance = await getUserBalance(account, selectedLoanToken.address);
+      const balance = await getUserBalance(
+        account,
+        selectedLoanToken.address as `0x${string}`
+      );
 
       if (typeof balance === "undefined") {
         return;
@@ -71,10 +81,9 @@ export default function PayLoan() {
         return;
       }
       await payLoan({
-        lender,
-        token: selectedLoanToken.address,
+        lender: lender as `0x${string}`,
+        token: selectedLoanToken.address as `0x${string}`,
         amount: +amount,
-        account: account,
       });
       toast.success("Loan accepted successfully!");
     } catch (error) {

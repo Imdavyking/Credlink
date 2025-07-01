@@ -29,7 +29,6 @@ export const getLiquidity = async ({
 }: {
   lender: `0x${string}`;
   token: `0x${string}`;
-  account: `0x${string}`;
 }) => {
   const { to, data } = await getFunction("liquidityPool", lender, token);
   const response = await publicClient().call({ to, data });
@@ -46,7 +45,6 @@ export const getCollaterial = async ({
 }: {
   borrower: `0x${string}`;
   token: `0x${string}`;
-  account: `0x${string}`;
 }) => {
   const { to, data } = await getFunction("collateral", borrower, token);
   const response = await publicClient().call({ to, data });
@@ -63,7 +61,6 @@ export const getDebt = async ({
 }: {
   borrower: `0x${string}`;
   token: `0x${string}`;
-  account: `0x${string}`;
 }) => {
   const { to, data } = await getFunction("debt", borrower, token);
   const response = await publicClient().call({ to, data });
@@ -82,7 +79,6 @@ export const createLoan = async ({
   token: `0x${string}`;
   amount: number;
   duration: bigint;
-  account: `0x${string}`;
 }) => {
   let value = 0n;
   let amountWithDecimals = 0n;
@@ -117,7 +113,6 @@ export const acceptLoan = async ({
   lender: `0x${string}`;
   token: `0x${string}`;
   amount: number;
-  account: `0x${string}`;
 }) => {
   let amountToLoan = 0n;
 
@@ -150,7 +145,6 @@ export const payLoan = async ({
   lender: `0x${string}`;
   token: `0x${string}`;
   amount: number;
-  account: `0x${string}`;
 }) => {
   let amountToPay = 0n;
   let value = 0n;
@@ -179,7 +173,6 @@ export const lockCollateral = async ({
 }: {
   token: string;
   amount: number;
-  account: `0x${string}`;
 }) => {
   let amountToLock = 0n;
 

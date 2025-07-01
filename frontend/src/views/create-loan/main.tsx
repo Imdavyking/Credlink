@@ -2,23 +2,35 @@ import { useEffect, useState } from "react";
 import { tokens } from "../../utils/constants";
 import { toast } from "react-toastify";
 import { createLoan, getUserBalance } from "../../services/blockchain.services";
-import { useWallet } from "../../context/WalletContext";
 
 import SubmitButton from "../../components/SubmitButton";
 import NumberInput from "../../components/NumberInput";
 import TokenDropdown from "../../components/TokenDropdown";
+import { getAccount } from "../../utils/config";
 export default function CreateLoan() {
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState("");
   const [creatingLoan, setCreatingLoan] = useState(false);
   const [balance, setBalance] = useState("");
-  const { account } = useWallet();
+  const [account, setAccount] = useState<`0x${string}` | null>(null);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      const account = await getAccount();
+      if (!account) return;
+      setAccount(account as `0x${string}`);
+    };
+    fetchAccount();
+  }, []);
 
   useEffect(() => {
     (async () => {
       if (!account) return;
-      const balance = await getUserBalance(account, selectedToken.address);
+      const balance = await getUserBalance(
+        account,
+        selectedToken.address as `0x${string}`
+      );
       setBalance(balance.toString());
     })();
   }, [account, selectedToken, creatingLoan]);
@@ -62,8 +74,7 @@ export default function CreateLoan() {
       }
 
       await createLoan({
-        account: account,
-        token,
+        token: token as `0x${string}`,
         amount: Number(amount),
         duration: BigInt(duration),
       });

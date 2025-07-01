@@ -4,14 +4,13 @@ import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
-import { useWallet } from "../../context/WalletContext";
 import {
   acceptLoan,
   getCollaterial,
   getLiquidity,
 } from "../../services/blockchain.services";
 import { toast } from "react-toastify";
-import { ss58ToH160 } from "../../utils/helpers";
+import { getAccount } from "../../utils/config";
 
 interface Token {
   name: string;
@@ -25,17 +24,23 @@ export default function AcceptLoanForm() {
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState("");
   const [collateral, setCollaterial] = useState("");
-  const { account } = useWallet();
+  const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [lender, setLender] = useState<string>("");
 
-  const [lender, setLender] = useState("");
+  useEffect(() => {
+    const fetchAccount = async () => {
+      const account = await getAccount();
+      if (!account) return;
+      setAccount(account as `0x${string}`);
+    };
+    fetchAccount();
+  }, []);
 
   useEffect(() => {
     const fetchCollaterial = async () => {
-      if (!account) return;
       const collaterial = await getCollaterial({
-        borrower: ss58ToH160(account.address).asHex(),
-        token: selectedLoanToken.address,
-        account,
+        borrower: account as `0x${string}`,
+        token: selectedLoanToken.address as `0x${string}`,
       });
       if (typeof collaterial === "undefined") {
         console.log("collateral is undefined");
@@ -49,12 +54,10 @@ export default function AcceptLoanForm() {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!account) return;
-      const lender = ss58ToH160(account.address).asHex();
-      setLender(lender);
+      setLender(account as `0x${string}`);
       const balance = await getLiquidity({
-        lender,
-        token: selectedLoanToken.address,
-        account,
+        lender: account as `0x${string}`,
+        token: selectedLoanToken.address as `0x${string}`,
       });
 
       if (typeof balance === "undefined") {
@@ -75,10 +78,9 @@ export default function AcceptLoanForm() {
         return;
       }
       await acceptLoan({
-        lender,
-        token: selectedLoanToken.address,
+        lender: lender as `0x${string}`,
+        token: selectedLoanToken.address as `0x${string}`,
         amount: +amount,
-        account: account,
       });
       toast.success("Loan accepted successfully!");
     } catch (error) {

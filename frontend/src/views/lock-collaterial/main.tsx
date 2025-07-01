@@ -3,12 +3,12 @@ import { tokens } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
-import { useWallet } from "../../context/WalletContext";
 import {
   getUserBalance,
   lockCollateral,
 } from "../../services/blockchain.services";
 import { toast } from "react-toastify";
+import { getAccount } from "../../utils/config";
 
 interface Token {
   name: string;
@@ -21,12 +21,24 @@ export default function LockCollaterial() {
   const [selectedToken, setSelectedToken] = useState<Token>(tokens[0]);
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState("");
-  const { account } = useWallet();
+  const [account, setAccount] = useState<`0x${string}` | null>(null);
+
+  useEffect(() => {
+    const fetchAccount = async () => {
+      const account = await getAccount();
+      if (!account) return;
+      setAccount(account as `0x${string}`);
+    };
+    fetchAccount();
+  }, []);
 
   useEffect(() => {
     (async () => {
       if (!account) return;
-      const balance = await getUserBalance(account, selectedToken.address);
+      const balance = await getUserBalance(
+        account,
+        selectedToken.address as `0x${string}`
+      );
 
       if (typeof balance === "undefined") {
         return;
@@ -46,7 +58,6 @@ export default function LockCollaterial() {
       await lockCollateral({
         token: selectedToken.address,
         amount: +amount,
-        account: account,
       });
       toast.success("Collateral locked successfully");
     } catch (error) {

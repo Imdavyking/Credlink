@@ -41,8 +41,8 @@ export default function Home() {
           >
             A decentralized protocol offering{" "}
             <strong>interest-free loans</strong> on the{" "}
-            <span className="text-pink-400">Polkadot</span> blockchain. Backed
-            by over-collateralized debt positions.
+            <span className="text-pink-400">Umi</span> blockchain. Backed by
+            over-collateralized debt positions.
           </motion.p>
         </header>
 
@@ -103,7 +103,7 @@ export default function Home() {
         </motion.div>
 
         <footer className="text-center text-gray-500 text-sm pb-8">
-          Built with ❤️ for the Polkadot ecosystem
+          Built with ❤️ for the Umi ecosystem
         </footer>
       </div>
     </div>
