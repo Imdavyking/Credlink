@@ -36,7 +36,8 @@ export const getLiquidity = async ({
   if (typeof response.data == "string")
     throw Error("Data is not an array of bytes");
   const liquidity = toBigInt(new Uint8Array(response.data));
-  return liquidity / BigInt(10 ** 18);
+
+  return Number(liquidity) / 10 ** 18;
 };
 
 export const getCollaterial = async ({
@@ -52,7 +53,7 @@ export const getCollaterial = async ({
   if (typeof response.data == "string")
     throw Error("Data is not an array of bytes");
   const collateral = toBigInt(new Uint8Array(response.data));
-  return collateral / BigInt(10 ** 18);
+  return Number(collateral) / 10 ** 18;
 };
 
 export const getDebt = async ({
@@ -68,7 +69,7 @@ export const getDebt = async ({
   if (typeof response.data == "string")
     throw Error("Data is not an array of bytes");
   const debt = toBigInt(new Uint8Array(response.data));
-  return debt / BigInt(10 ** 18);
+  return Number(debt) / 10 ** 18;
 };
 
 export const createLoan = async ({

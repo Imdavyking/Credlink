@@ -1,11 +1,11 @@
 // import usdc from "../assets/images/usdc.png";
-import polkadot from "../assets/images/polkadot.png";
+import logo from "../assets/images/umi.svg";
 import { ethers } from "ethers";
 export const tokens = [
   {
     name: "ETH",
     address: ethers.ZeroAddress,
-    image: polkadot,
+    image: logo,
   },
 ];
 export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
