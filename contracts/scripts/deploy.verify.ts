@@ -1,5 +1,4 @@
-import hre, { ethers } from "hardhat"
-import UmixDeployer from "../ignition/modules/UmixDeployer"
+import { ethers } from "hardhat"
 import { verify } from "../utils/verify"
 import dotenv from "dotenv"
 import { network } from "hardhat"
@@ -10,13 +9,29 @@ import { BCS, getRustConfig } from "@benfen/bcs"
 import { localHardhat } from "../utils/localhardhat.chainid"
 
 dotenv.config()
+const bcs = new BCS(getRustConfig())
+bcs.registerEnumType("ScriptOrDeployment", {
+    Script: "",
+    Module: "",
+    EvmContract: "Vec<u8>",
+})
+
+bcs.registerEnumType("SerializableTransactionData", {
+    EoaBaseTokenTransfer: "",
+    ScriptOrDeployment: "",
+    EntryFunction: "",
+    L2Contract: "",
+    EvmContract: "Vec<u8>",
+})
 
 async function main() {
     const chainId = network.config.chainId!
     cleanDeployments(chainId!)
-    const { umixDeployer } = await hre.ignition.deploy(UmixDeployer)
-    const umixAddress = await umixDeployer.getAddress()
     const umixFactory = await ethers.getContractFactory("Umix")
+    const umiCode = await umixFactory.deploy()
+    await umiCode.waitForDeployment()
+    const umixAddress = await umiCode.getAddress()
+    console.log("Counter is deployed to:", umixAddress)
     const code = serialize(umixFactory.bytecode)
     console.log("CODE:", code)
     const chainName = process.env.CHAIN_NAME!
@@ -54,22 +69,6 @@ async function main() {
     copyABI("Umix", "frontend/src/assets/json", "umix")
     copyABI("Umix", "indexer/abis", "umix")
 }
-
-const bcs = new BCS(getRustConfig())
-// EVM contracts are encapsulated in an enum along with script transactions
-bcs.registerEnumType("ScriptOrDeployment", {
-    Script: "",
-    Module: "",
-    EvmContract: "Vec<u8>",
-})
-
-bcs.registerEnumType("SerializableTransactionData", {
-    EoaBaseTokenTransfer: "",
-    ScriptOrDeployment: "",
-    EntryFunction: "",
-    L2Contract: "",
-    EvmContract: "Vec<u8>",
-})
 
 const serialize = (bytecode: string): string => {
     // Extract the byte array to serialize within the higher level enum
