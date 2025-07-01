@@ -73,7 +73,13 @@ async function main() {
 const serialize = (bytecode: string): string => {
     // Extract the byte array to serialize within the higher level enum
     const code = Uint8Array.from(Buffer.from(bytecode.replace("0x", ""), "hex"))
-    const evmContract = bcs.ser("ScriptOrDeployment", { EvmContract: code })
+    const evmContract = bcs.ser(
+        "ScriptOrDeployment",
+        { EvmContract: code },
+        {
+            maxSize: 1000000,
+        }
+    )
     return "0x" + evmContract.toString("hex")
 }
 main().catch(console.error)
