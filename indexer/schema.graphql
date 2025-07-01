@@ -1,0 +1,128 @@
+type Donation @entity {
+  id: ID!
+  user: String!
+  token: String!
+  amount: BigInt!
+  charityCategory: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type PointsAdded @entity {
+  id: ID!
+  user: String! @index
+  points: BigInt!
+  updatedTimeStamp: BigInt!
+  createdTimeStamp: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type OwnershipTransfer @entity {
+  id: ID!
+  previousOwner: String!
+  newOwner: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type OrocleUpdate @entity {
+  id: ID!
+  oldOrocle: String!
+  newOrocle: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type PointsRedeemed @entity {
+  id: ID!
+  user: String!
+  points: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type CharityAdded @entity {
+  id: ID!
+  charityCategory: BigInt!
+  charityAddress: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type ProposalCreated @entity {
+  id: ID!
+  proposalId: BigInt!
+  proposer: String!
+  targets: [String!]!
+  signatures: [String!]!
+  calldatas: [String!]!
+  voteStart: BigInt!
+  voteEnd: BigInt!
+  description: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+  state: BigInt!
+  etaSecondsQueue: BigInt!
+  votesFor: BigInt!
+  votesAgainst: BigInt!
+  weightVotesFor: BigInt!
+  weightVotesAgainst: BigInt!
+  createdTimeStamp: BigInt!
+  queuedTimeStamp: BigInt!
+  executedTimeStamp: BigInt!
+  canceledTimeStamp: BigInt!
+}
+
+type ProposalCanceled @entity {
+  id: ID!
+  proposalId: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type ProposalExecuted @entity {
+  id: ID!
+  proposalId: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type ProposalQueued @entity {
+  id: ID!
+  proposalId: BigInt!
+  etaSeconds: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type ProposalThresholdSet @entity {
+  id: ID!
+  oldProposalThreshold: BigInt!
+  newProposalThreshold: BigInt!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type VoteCast @entity {
+  id: ID!
+  voter: String!
+  proposalId: BigInt!
+  support: BigInt!
+  weight: BigInt!
+  reason: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
+
+type VoteCastWithParams @entity {
+  id: ID!
+  voter: String!
+  proposalId: BigInt!
+  support: BigInt!
+  weight: BigInt!
+  reason: String!
+  params: String!
+  blockHeight: BigInt!
+  contractAddress: String!
+}
