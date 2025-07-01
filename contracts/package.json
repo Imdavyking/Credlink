@@ -8,8 +8,8 @@
         "format": "prettier --write .",
         "coverage": "hardhat coverage",
         "test": "yarn hardhat test",
-        "test-staging": "yarn hardhat test --network sonicNetwork",
-        "deploy": "yarn hardhat clean && npx hardhat run scripts/deploy.verify.ts --network sonicNetwork"
+        "test-staging": "yarn hardhat test --network umi",
+        "deploy": "yarn hardhat clean && npx hardhat run scripts/deploy.verify.ts --network umi"
     },
     "devDependencies": {
         "@benfen/bcs": "^0.1.0",

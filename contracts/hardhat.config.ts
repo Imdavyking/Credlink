@@ -13,8 +13,8 @@ const networkName = process.env.NETWORK_NAME || "umi"
 const RPC_URL = process.env.RPC_URL
 const CHAIN_ID = process.env.CHAIN_ID
 const API_URL = process.env.API_URL
-const BROWSER_URL = process.env.BROWSER_URL
-const API_SCAN_VERIFIER_KEY = process.env.API_SCAN_VERIFIER_KEY
+const BROWSER_URL = process.env.BROWSER_URL || ""
+const API_SCAN_VERIFIER_KEY = process.env.API_SCAN_VERIFIER_KEY || ""
 
 if (!RPC_URL) {
     throw new Error("RPC_URL is not set")
@@ -73,7 +73,7 @@ const config: HardhatUserConfig = {
         localhost: {
             chainId: 31337,
         },
-        sonicNetwork: {
+        [networkName]: {
             url: process.env.RPC_URL,
             accounts: [wallet.privateKey],
             chainId: +CHAIN_ID!,
