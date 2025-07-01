@@ -29,10 +29,14 @@ async function main() {
     cleanDeployments(chainId!)
     const umixFactory = await ethers.getContractFactory("Umix")
     const code = serialize(umixFactory.bytecode)
-    console.log("CODE:", code)
-    const umixCode = await umixFactory.deploy()
-    await umixCode.waitForDeployment()
-    const umixAddress = await umixCode.getAddress()
+    const [deployer] = await ethers.getSigners()
+    const tx = await deployer.sendTransaction({
+        data: code,
+    })
+
+    console.log("Deploying contract...")
+    const receipt = await tx.wait()
+    const umixAddress = receipt!.contractAddress!
     console.log("Umix is deployed to:", umixAddress)
     const chainName = process.env.CHAIN_NAME!
     const chainCurrencyName = process.env.CHAIN_CURRENCY_NAME!
