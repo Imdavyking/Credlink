@@ -28,12 +28,12 @@ async function main() {
     const chainId = network.config.chainId!
     cleanDeployments(chainId!)
     const umixFactory = await ethers.getContractFactory("Umix")
-    const umiCode = await umixFactory.deploy()
-    await umiCode.waitForDeployment()
-    const umixAddress = await umiCode.getAddress()
-    console.log("Counter is deployed to:", umixAddress)
     const code = serialize(umixFactory.bytecode)
     console.log("CODE:", code)
+    const umixCode = await umixFactory.deploy()
+    await umixCode.waitForDeployment()
+    const umixAddress = await umixCode.getAddress()
+    console.log("Umix is deployed to:", umixAddress)
     const chainName = process.env.CHAIN_NAME!
     const chainCurrencyName = process.env.CHAIN_CURRENCY_NAME!
     const chainSymbol = process.env.CHAIN_SYMBOL!
