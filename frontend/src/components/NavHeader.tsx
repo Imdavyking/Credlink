@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import ConnectWalletButton from "./ConnectWalletButton";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const NavHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,14 +28,12 @@ const NavHeader = () => {
   return (
     <header className="p-6 border-b shadow-sm bg-white flex justify-between items-center mb-6 relative">
       <Link to="/">
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-600">
-          Umix
-        </h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-600">Umix</h1>
       </Link>
 
       {/* Desktop Nav */}
       <nav className="hidden md:flex space-x-6 items-center">
-        {renderLinks()} <ConnectWalletButton />
+        {renderLinks()} <ConnectButton />
       </nav>
 
       {/* Mobile Menu Button */}
@@ -52,7 +50,7 @@ const NavHeader = () => {
       {menuOpen && (
         <nav className="absolute top-full left-0 right-0 bg-white shadow-md flex flex-col space-y-4 p-4 md:hidden z-50">
           {renderLinks(true)}
-          <ConnectWalletButton />
+          <ConnectButton />
         </nav>
       )}
     </header>
