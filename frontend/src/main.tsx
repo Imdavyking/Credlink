@@ -13,12 +13,12 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { WALLET_CONNECT_PROJECT_ID } from "./utils/constants.ts";
 import { ApolloProvider } from "@apollo/client";
 import client from "./services/apollo.services.ts";
-import { devnet } from "./utils/config.ts";
+import { umiDevnet } from "./utils/config.ts";
 
 const config = getDefaultConfig({
   appName: "Umix",
   projectId: WALLET_CONNECT_PROJECT_ID,
-  chains: [devnet],
+  chains: [umiDevnet],
 });
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
