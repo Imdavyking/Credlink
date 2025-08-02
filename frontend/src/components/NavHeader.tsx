@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "thirdweb/react";
+import { THIRDWEB_CLIENT } from "../utils/constants";
 
 const NavHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -33,7 +34,7 @@ const NavHeader = () => {
 
       {/* Desktop Nav */}
       <nav className="hidden md:flex space-x-6 items-center">
-        {renderLinks()} <ConnectButton />
+        {renderLinks()} <ConnectButton client={THIRDWEB_CLIENT} />
       </nav>
 
       {/* Mobile Menu Button */}
@@ -50,7 +51,7 @@ const NavHeader = () => {
       {menuOpen && (
         <nav className="absolute top-full left-0 right-0 bg-white shadow-md flex flex-col space-y-4 p-4 md:hidden z-50">
           {renderLinks(true)}
-          <ConnectButton />
+          <ConnectButton client={THIRDWEB_CLIENT} />
         </nav>
       )}
     </header>

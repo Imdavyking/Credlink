@@ -1,17 +1,18 @@
 import { BrowserProvider, ethers } from "ethers";
-import {
-  createPublicClient,
-  createWalletClient,
-  custom,
-  defineChain,
-} from "viem";
-import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
+import { createPublicClient, custom, defineChain } from "viem";
+import { publicActionsL2 } from "viem/op-stack";
 import abi from "../assets/json/umix.json";
-import { CONTRACT_ADDRESS } from "./constants";
+import { etherlinkTestnet } from "thirdweb/chains";
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
 
 export const umixInterface = new ethers.Interface(abi);
 
-export const umiDevnet = defineChain({
+export const etherlinkTestnetViem = defineChain({
   id: 128123,
   sourceId: 128123,
   name: "XTZ",
@@ -58,21 +59,23 @@ async function switchOrAddChain(
       if (error.code === 4902) {
         console.log(`Chain ${targetChainId} not found. Attempting to add.`);
 
-        if (targetChainId === Number(umiDevnet.id)) {
+        if (targetChainId === Number(etherlinkTestnet.id)) {
           await ethProvider.provider.send("wallet_addEthereumChain", [
             {
               chainId: chainIdHex,
-              chainName: umiDevnet.name,
+              chainName: etherlinkTestnet.name,
               nativeCurrency: {
-                name: umiDevnet.nativeCurrency.name,
-                symbol: umiDevnet.nativeCurrency.symbol,
+                name: etherlinkTestnet.nativeCurrency?.name,
+                symbol: etherlinkTestnet.nativeCurrency?.symbol,
                 decimals: 18,
               },
-              rpcUrls: [umiDevnet.rpcUrls.default.http[0]],
-              blockExplorerUrls: [umiDevnet.blockExplorers?.default.url],
+              rpcUrls: [etherlinkTestnet.rpc],
+              blockExplorerUrls: [
+                etherlinkTestnet.blockExplorers?.[0]?.url || "",
+              ],
             },
           ]);
-          console.log(`${umiDevnet.id} added and switched`);
+          console.log(`${etherlinkTestnet.id} added and switched`);
         }
       } else {
         console.error(`Failed to switch to ${targetChainId}:`, error);
@@ -92,34 +95,12 @@ export const getAccount = async () => {
 
 export const publicClient = () =>
   createPublicClient({
-    chain: umiDevnet,
+    chain: etherlinkTestnetViem,
     transport: custom(window.ethereum!),
   }).extend(publicActionsL2());
-
-export const walletClient = () =>
-  createWalletClient({
-    chain: umiDevnet,
-    transport: custom(window.ethereum!),
-  }).extend(walletActionsL2());
 
 export const getSigner = async () => {
   const provider = new BrowserProvider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
   return provider.getSigner();
-};
-
-export const getFunction = async (name: string, ...args: any[]) => {
-  const signer = await getSigner();
-
-  await switchOrAddChain(signer.provider, umiDevnet.id);
-  const contract = new ethers.Contract(CONTRACT_ADDRESS, umixInterface);
-  const fn = contract.getFunction(name);
-  if (!fn) throw new Error(`Function "${name}" not found in ABI`);
-
-  const tx = await fn.populateTransaction(...args);
-
-  return {
-    to: tx.to as `0x${string}`,
-    data: tx.data,
-  };
 };

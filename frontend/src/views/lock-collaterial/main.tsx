@@ -1,98 +1,97 @@
-import { useEffect, useState } from "react";
-import { tokens } from "../../utils/constants";
+import { useState } from "react";
+import { tokens, umixContract } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
-import {
-  getUserBalance,
-  lockCollateral,
-} from "../../services/blockchain.services";
 import { toast } from "react-toastify";
-import { getAccount } from "../../utils/config";
 
-interface Token {
-  name: string;
-  address: string;
-  image: string;
-}
+import { useActiveAccount, useReadContract } from "thirdweb/react";
+import {
+  prepareContractCall,
+  sendAndConfirmTransaction,
+  toUnits,
+} from "thirdweb";
 
-export default function LockCollaterial() {
+export default function LockCollateral() {
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address;
+
   const [amount, setAmount] = useState("");
-  const [selectedToken, setSelectedToken] = useState<Token>(tokens[0]);
-  const [loading, setLoading] = useState(false);
-  const [balance, setBalance] = useState("");
-  const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [selectedToken, setSelectedToken] = useState(tokens[0]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchAccount = async () => {
-      const account = await getAccount();
-      if (!account) return;
-      setAccount(account as `0x${string}`);
-    };
-    fetchAccount();
-  }, []);
+  const { data: balance, isLoading: loadingBalance } = useReadContract({
+    contract: umixContract,
+    method:
+      "function getUserBalance(address account, address token) view returns (uint256)",
+    params: [
+      address ?? "0x0000000000000000000000000000000000000000",
+      selectedToken.address,
+    ],
+  });
 
-  useEffect(() => {
-    (async () => {
-      if (!account) return;
-      const balance = await getUserBalance(
-        account,
-        selectedToken.address as `0x${string}`
-      );
-
-      if (typeof balance === "undefined") {
-        return;
-      }
-      setBalance(balance.toString());
-    })();
-  }, [account, selectedToken, loading]);
-
-  const handlePayLoan = async (e: React.FormEvent) => {
+  const handleLockCollateral = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
+    if (!amount || Number(amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
+
     try {
-      if (!account) {
-        toast.error("Please connect your wallet");
-        return;
-      }
-      await lockCollateral({
-        token: selectedToken.address,
-        amount: +amount,
+      setIsSubmitting(true);
+
+      const trx = prepareContractCall({
+        contract: umixContract,
+        method: "function lockCollateral(address token, uint256 amount)",
+        params: [selectedToken.address, toUnits(amount, 18)],
       });
+
+      await sendAndConfirmTransaction({
+        transaction: trx,
+        account: activeAccount,
+      });
+
       toast.success("Collateral locked successfully");
+      setAmount("");
     } catch (error) {
-      console.error("Error:", error);
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("An error occurred");
-      }
+      console.error("Lock collateral error:", error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <>
-      <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 space-y-4">
-        <h2 className="text-xl font-bold text-gray-800">Lock Collaterial</h2>
-        <form onSubmit={handlePayLoan} className="space-y-4">
-          <TokenDropdown
-            label="Token"
-            tokens={tokens}
-            selectedToken={selectedToken}
-            setSelectedToken={setSelectedToken}
-            balance={balance}
-          />
-          <NumberInput
-            label="Amount"
-            placeholder="1000"
-            defaultValue={amount}
-            onChange={(value) => setAmount(value)}
-          />
-          <SubmitButton isSubmitting={loading} />
-        </form>
-      </div>
-    </>
+    <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 space-y-4">
+      <h2 className="text-xl font-bold text-gray-800">Lock Collateral</h2>
+      <form onSubmit={handleLockCollateral} className="space-y-4">
+        <TokenDropdown
+          label="Token"
+          tokens={tokens}
+          selectedToken={selectedToken}
+          setSelectedToken={setSelectedToken}
+          balance={
+            loadingBalance
+              ? "Loading..."
+              : balance
+              ? `${Number(balance) / 10 ** 18}`
+              : "0"
+          }
+        />
+        <NumberInput
+          label="Amount"
+          placeholder="1000"
+          defaultValue={amount}
+          onChange={(value) => setAmount(value)}
+        />
+        <SubmitButton isSubmitting={isSubmitting} />
+      </form>
+    </div>
   );
 }

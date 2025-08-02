@@ -1,4 +1,4 @@
-# **Interest-Free P2P Lending Protocol**
+# **CredLink: Interest-Free P2P Lending Protocol**
 
 ## **Overview**
 

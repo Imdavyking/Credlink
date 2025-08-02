@@ -30,7 +30,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Umix
+            CredLink
           </motion.h1>
 
           <motion.p
@@ -56,7 +56,7 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold text-purple-300 mb-4">
-              Why Umix?
+              Why CredLink?
             </h2>
             <ul className="space-y-3 text-gray-300">
               <li>🔐 No interest — truly DeFi</li>
@@ -103,7 +103,7 @@ export default function Home() {
         </motion.div>
 
         <footer className="text-center text-gray-500 text-sm pb-8">
-          Built with ❤️ for the Umi ecosystem
+          Built with ❤️
         </footer>
       </div>
     </div>

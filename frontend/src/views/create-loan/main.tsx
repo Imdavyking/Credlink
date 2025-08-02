@@ -1,96 +1,79 @@
-import { useEffect, useState } from "react";
-import { tokens } from "../../utils/constants";
+import { useState } from "react";
+import { tokens, umixContract } from "../../utils/constants";
 import { toast } from "react-toastify";
-import { createLoan, getUserBalance } from "../../services/blockchain.services";
 
 import SubmitButton from "../../components/SubmitButton";
 import NumberInput from "../../components/NumberInput";
 import TokenDropdown from "../../components/TokenDropdown";
-import { getAccount } from "../../utils/config";
+
+import { useActiveAccount, useReadContract } from "thirdweb/react";
+import {
+  prepareContractCall,
+  sendAndConfirmTransaction,
+  toUnits,
+} from "thirdweb";
+
 export default function CreateLoan() {
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address;
+
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState("");
-  const [creatingLoan, setCreatingLoan] = useState(false);
-  const [balance, setBalance] = useState("");
-  const [account, setAccount] = useState<`0x${string}` | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchAccount = async () => {
-      const account = await getAccount();
-      if (!account) return;
-      setAccount(account as `0x${string}`);
-    };
-    fetchAccount();
-  }, []);
+  const { data: balanceData, isLoading: balanceLoading } = useReadContract({
+    contract: umixContract,
+    method:
+      "function getUserBalance(address account, address token) view returns (uint256)",
+    params: [
+      address ?? "0x0000000000000000000000000000000000000000",
+      selectedToken.address,
+    ],
+    // Alternatively, call directly from ERC20 if needed
+  });
 
-  useEffect(() => {
-    (async () => {
-      if (!account) return;
-      const balance = await getUserBalance(
-        account,
-        selectedToken.address as `0x${string}`
-      );
-      setBalance(balance.toString());
-    })();
-  }, [account, selectedToken, creatingLoan]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount) {
+    if (!amount || Number(amount) <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    if (!duration) {
+    if (!duration || Number(duration) <= 0) {
       toast.error("Please enter a valid duration");
       return;
     }
 
-    onSubmit({
-      token: selectedToken.address,
-      amount,
-      duration,
-    });
-  };
+    if (!address) {
+      toast.error("Please connect your wallet");
+      return;
+    }
 
-  const onSubmit = async (data: {
-    token: string;
-    amount: string;
-    duration: string;
-  }) => {
     try {
-      const { token, amount, duration } = data;
-      if (!token) {
-        toast.error("Please select a token");
-        return;
-      }
-      setCreatingLoan(true);
+      setIsSubmitting(true);
 
-      if (!account) {
-        toast.error("Please connect your wallet");
-        return;
-      }
+      const trx = prepareContractCall({
+        contract: umixContract,
+        method:
+          "function createLoan(address token, uint256 amount, uint256 duration)",
+        params: [selectedToken.address, toUnits(amount, 18), BigInt(duration)],
+      });
 
-      await createLoan({
-        token: token as `0x${string}`,
-        amount: Number(amount),
-        duration: BigInt(duration),
+      await sendAndConfirmTransaction({
+        transaction: trx,
+        account: activeAccount,
       });
 
       toast.success("Loan offer created successfully!");
       setAmount("");
       setDuration("");
     } catch (error) {
-      console.error("Error:", error);
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("An error occurred");
-      }
+      console.error("Create loan error:", error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
-      setCreatingLoan(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -99,26 +82,35 @@ export default function CreateLoan() {
       <h2 className="text-xl font-bold text-gray-800">Create Loan Offer</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Token Dropdown */}
-
         <TokenDropdown
           label="Loan Token"
           tokens={tokens}
           selectedToken={selectedToken}
-          setSelectedToken={(token) => {
-            setSelectedToken(token);
-          }}
-          balance={balance}
+          setSelectedToken={setSelectedToken}
+          balance={
+            balanceLoading
+              ? "Loading..."
+              : balanceData
+              ? `${Number(balanceData) / 10 ** 18}`
+              : "0"
+          }
         />
 
-        <NumberInput defaultValue={duration} onChange={setDuration} />
+        <NumberInput
+          defaultValue={duration}
+          onChange={setDuration}
+          label="Duration (in seconds)"
+          placeholder="e.g., 604800"
+        />
+
         <NumberInput
           defaultValue={amount}
           onChange={setAmount}
           label="Amount"
           placeholder="Enter Amount"
         />
-        <SubmitButton isSubmitting={creatingLoan} />
+
+        <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </div>
   );
