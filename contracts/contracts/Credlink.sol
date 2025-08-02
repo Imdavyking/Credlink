@@ -47,6 +47,8 @@ contract Credlink is Ownable {
     mapping(address => mapping(address => uint256)) public liquidityPool;
     mapping(address => Loan[]) public activeLoans;
 
+    address public ETHERLINK_TESTNET_USDT = 0xf7f007dc8Cb507e25e8b7dbDa600c07FdCF9A75B;
+
     uint256 public minCollateralRatio = 15000; // 150% in basis points
 
     struct Loan {
