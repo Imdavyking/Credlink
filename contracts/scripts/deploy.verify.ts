@@ -5,33 +5,17 @@ import { network } from "hardhat"
 import { cleanDeployments } from "../utils/clean"
 import { updateEnv } from "./update.env"
 import { copyABI } from "./copy.abi"
-import { BCS, getRustConfig } from "@benfen/bcs"
 import { localHardhat } from "../utils/localhardhat.chainid"
 
 dotenv.config()
-const bcs = new BCS(getRustConfig())
-bcs.registerEnumType("ScriptOrDeployment", {
-    Script: "",
-    Module: "",
-    EvmContract: "Vec<u8>",
-})
-
-bcs.registerEnumType("SerializableTransactionData", {
-    EoaBaseTokenTransfer: "",
-    ScriptOrDeployment: "",
-    EntryFunction: "",
-    L2Contract: "",
-    EvmContract: "Vec<u8>",
-})
 
 async function main() {
     const chainId = network.config.chainId!
     cleanDeployments(chainId!)
     const umixFactory = await ethers.getContractFactory("Umix")
-    const code = serialize(umixFactory.bytecode)
     const [deployer] = await ethers.getSigners()
     const tx = await deployer.sendTransaction({
-        data: code,
+        data: umixFactory.bytecode,
     })
 
     console.log("Deploying contract...")
@@ -74,16 +58,4 @@ async function main() {
     copyABI("Umix", "indexer/abis", "umix")
 }
 
-const serialize = (bytecode: string): string => {
-    // Extract the byte array to serialize within the higher level enum
-    const code = Uint8Array.from(Buffer.from(bytecode.replace("0x", ""), "hex"))
-    const evmContract = bcs.ser(
-        "ScriptOrDeployment",
-        { EvmContract: code },
-        {
-            maxSize: 1000000,
-        }
-    )
-    return "0x" + evmContract.toString("hex")
-}
 main().catch(console.error)

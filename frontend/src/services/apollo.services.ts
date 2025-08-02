@@ -1,8 +1,8 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { SUBQUERY_ENDPOINT } from "../utils/constants";
+import { GOLDSKY_ENDPOINT } from "../utils/constants";
 
 const client = new ApolloClient({
-  uri: SUBQUERY_ENDPOINT,
+  uri: GOLDSKY_ENDPOINT,
   cache: new InMemoryCache(),
 });
 

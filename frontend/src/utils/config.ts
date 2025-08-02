@@ -30,8 +30,8 @@ const serializeFunction = (data: string): `0x${string}` => {
 };
 
 export const umiDevnet = defineChain({
-  id: 42069,
-  sourceId: 42069,
+  id: 128123,
+  sourceId: 128123,
   name: "Umi",
   nativeCurrency: {
     decimals: 18,
