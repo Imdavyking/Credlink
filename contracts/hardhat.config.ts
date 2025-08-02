@@ -9,7 +9,7 @@ import { initKeystore } from "./utils/init.keystore"
 dotenv.config()
 
 const wallet = initKeystore(null)
-const networkName = process.env.NETWORK_NAME || "umi"
+const networkName = process.env.NETWORK_NAME || "etherlinkTestnet"
 const RPC_URL = process.env.RPC_URL
 const CHAIN_ID = process.env.CHAIN_ID
 const API_URL = process.env.API_URL
