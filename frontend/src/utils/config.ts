@@ -26,6 +26,8 @@ export const etherlinkTestnetViem = defineChain({
   },
 });
 
+//ignore
+//@ts-ignore
 async function switchOrAddChain(
   ethProvider: ethers.JsonRpcApiProvider,
   switchChainId: string | number
