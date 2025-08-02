@@ -66,4 +66,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## **Acknowledgments**
 
 - Inspired by **Liquity Protocol** (interest-free loan model).
-- Built using **Umi** and **Ink!** for decentralized smart contracts.
+- Built using **Solidity** for decentralized smart contracts.
