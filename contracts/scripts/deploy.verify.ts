@@ -12,21 +12,21 @@ dotenv.config()
 async function main() {
     const chainId = network.config.chainId!
     cleanDeployments(chainId!)
-    const umixFactory = await ethers.getContractFactory("Umix")
+    const credLinkFactory = await ethers.getContractFactory("Credlink")
     const [deployer] = await ethers.getSigners()
     const tx = await deployer.sendTransaction({
-        data: umixFactory.bytecode,
+        data: credLinkFactory.bytecode,
     })
 
     console.log("Deploying contract...")
     const receipt = await tx.wait()
-    const umixAddress = receipt!.contractAddress!
-    console.log("Umix is deployed to:", umixAddress)
+    const credlinkAddress = receipt!.contractAddress!
+    console.log("credLink is deployed to:", credlinkAddress)
     const chainName = process.env.CHAIN_NAME!
     const chainCurrencyName = process.env.CHAIN_CURRENCY_NAME!
     const chainSymbol = process.env.CHAIN_SYMBOL!
-    console.log(`Umix deployed to: ${umixAddress}`)
-    await verify(umixAddress, [])
+    console.log(`credLink deployed to: ${credlinkAddress}`)
+    await verify(credlinkAddress, [])
 
     if (typeof chainId !== "undefined" && localHardhat.includes(chainId)) return
 
@@ -34,8 +34,8 @@ async function main() {
     const rpcUrl = (network.config as any).url
     const blockExplorerUrl = network.config.ignition.explorerUrl!
     /** contract address */
-    updateEnv(umixAddress, "frontend", "VITE_CONTRACT_ADDRESS")
-    updateEnv(umixAddress, "indexer", "CONTRACT_ADDRESS")
+    updateEnv(credlinkAddress, "frontend", "VITE_CONTRACT_ADDRESS")
+    updateEnv(credlinkAddress, "indexer", "CONTRACT_ADDRESS")
 
     /** block number */
     updateEnv(blockNumber.toString(), "indexer", "BLOCK_NUMBER")
@@ -54,8 +54,8 @@ async function main() {
     /** update chain currency name */
     updateEnv(chainSymbol, "frontend", "VITE_CHAIN_SYMBOL")
 
-    copyABI("Umix", "frontend/src/assets/json", "umix")
-    copyABI("Umix", "indexer/abis", "umix")
+    copyABI("Credlink", "frontend/src/assets/json", "credlink")
+    copyABI("Credlink", "indexer/abis", "credlink")
 }
 
 main().catch(console.error)

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { tokens, umixContract } from "../../utils/constants";
+import { tokens, credLinkContract } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
@@ -25,7 +25,7 @@ export default function AcceptLoanForm() {
   const [lender, setLender] = useState<string>("");
 
   const { data: collateral, isLoading: collateralLoading } = useReadContract({
-    contract: umixContract,
+    contract: credLinkContract,
     method:
       "function collateral(address borrower, address token) view returns (uint256)",
     params: [
@@ -35,7 +35,7 @@ export default function AcceptLoanForm() {
   });
 
   const { data: balance, isLoading: balanceLoading } = useReadContract({
-    contract: umixContract,
+    contract: credLinkContract,
     method:
       "function liquidityPool(address lender, address token) view returns (uint256)",
     params: [
@@ -55,7 +55,7 @@ export default function AcceptLoanForm() {
       setIsSubmitting(true);
 
       const trx = prepareContractCall({
-        contract: umixContract,
+        contract: credLinkContract,
         method:
           "function acceptLoan(address lender, address token, uint256 amount)",
         params: [

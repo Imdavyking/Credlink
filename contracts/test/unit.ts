@@ -11,24 +11,20 @@ const chainId = network.config.chainId
 
 typeof chainId !== "undefined" && !localHardhat.includes(chainId)
     ? describe.skip
-    : describe("UmixDeployer", function () {
-          // We define a fixture to reuse the same setup in every test.
-          // We use loadFixture to run this setup once, snapshot that state,
-          // and reset Hardhat Network to that snapshot in every test.
-          async function deployUmixFixture() {
-              // Contracts are deployed using the first signer/account by default
+    : describe("CredlinkDeployer", function () {
+          async function deployCredlinkFixture() {
               const [owner, otherAccount] = await hre.ethers.getSigners()
 
-              const UmixDeployer = await hre.ethers.getContractFactory("Umix")
+              const credDeployer = await hre.ethers.getContractFactory("Credlink")
 
-              const umixDeployer = await UmixDeployer.deploy()
+              const credLinkDeployer = await credDeployer.deploy()
 
-              await umixDeployer.waitForDeployment()
+              await credLinkDeployer.waitForDeployment()
 
-              const umixAddress = await umixDeployer.getAddress()
+              const credLinkAddress = await credLinkDeployer.getAddress()
               return {
-                  umixDeployer,
-                  umixAddress,
+                  credLinkDeployer,
+                  credLinkAddress,
                   owner,
                   otherAccount,
               }
@@ -36,112 +32,121 @@ typeof chainId !== "undefined" && !localHardhat.includes(chainId)
 
           describe("Deployment", function () {
               it("Should set owner on deployer", async function () {
-                  const { umixDeployer, owner, otherAccount } = await loadFixture(
-                      deployUmixFixture
+                  const { credLinkDeployer, owner, otherAccount } = await loadFixture(
+                      deployCredlinkFixture
                   )
-                  const deployerOwner = await umixDeployer.owner()
+                  const deployerOwner = await credLinkDeployer.owner()
                   expect(deployerOwner).to.equal(owner.address)
               })
           })
 
           describe("createLoan", function () {
               it("Should create a loan", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("1.0")
                   const duration = 86400
-                  const tx = await umixDeployer.createLoan(ethers.ZeroAddress, value, duration, {
-                      value: value,
-                      gasLimit: 5000000,
-                      gasPrice: ethers.parseUnits("10", "gwei"),
-                      from: owner.address,
-                  })
+                  const tx = await credLinkDeployer.createLoan(
+                      ethers.ZeroAddress,
+                      value,
+                      duration,
+                      {
+                          value: value,
+                          gasLimit: 5000000,
+                          gasPrice: ethers.parseUnits("10", "gwei"),
+                          from: owner.address,
+                      }
+                  )
                   await tx.wait()
-                  expect(tx).to.emit(umixDeployer, "LoanCreated")
+                  expect(tx).to.emit(credLinkDeployer, "LoanCreated")
               })
           })
 
           describe("createLoan with zero amount", function () {
               it("Should fail to create a loan with zero amount", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("0.0")
                   const duration = 86400
                   await expect(
-                      umixDeployer.createLoan(ethers.ZeroAddress, value, duration, {
+                      credLinkDeployer.createLoan(ethers.ZeroAddress, value, duration, {
                           value: value,
                           gasLimit: 5000000,
                           gasPrice: ethers.parseUnits("10", "gwei"),
                           from: owner.address,
                       })
-                  ).to.be.revertedWithCustomError(umixDeployer, "Umix__ZeroAmount")
+                  ).to.be.revertedWithCustomError(credLinkDeployer, "Credlink__ZeroAmount")
               })
           })
 
           describe("createLoan with zero duration", function () {
               it("Should fail to create a loan with zero duration", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("1.0")
                   const duration = 0
                   await expect(
-                      umixDeployer.createLoan(ethers.ZeroAddress, value, duration, {
+                      credLinkDeployer.createLoan(ethers.ZeroAddress, value, duration, {
                           value: value,
                           gasLimit: 5000000,
                           gasPrice: ethers.parseUnits("10", "gwei"),
                           from: owner.address,
                       })
-                  ).to.be.revertedWithCustomError(umixDeployer, "Umix__ZeroDuration")
+                  ).to.be.revertedWithCustomError(credLinkDeployer, "Credlink__ZeroDuration")
               })
           })
 
           describe("lockCollateral", function () {
               it("Should lock collateral", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("1.0")
-                  const tx = await umixDeployer.lockCollateral(ethers.ZeroAddress, value, {
+                  const tx = await credLinkDeployer.lockCollateral(ethers.ZeroAddress, value, {
                       value: value,
                       gasLimit: 5000000,
                       gasPrice: ethers.parseUnits("10", "gwei"),
                       from: owner.address,
                   })
                   await tx.wait()
-                  expect(tx).to.emit(umixDeployer, "CollateralLocked")
+                  expect(tx).to.emit(credLinkDeployer, "CollateralLocked")
               })
           })
 
           describe("lockCollateral with zero amount", function () {
               it("Should fail to lock collateral with zero amount", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("0.0")
                   await expect(
-                      umixDeployer.lockCollateral(ethers.ZeroAddress, value, {
+                      credLinkDeployer.lockCollateral(ethers.ZeroAddress, value, {
                           value: value,
                           gasLimit: 5000000,
                           gasPrice: ethers.parseUnits("10", "gwei"),
                           from: owner.address,
                       })
-                  ).to.be.revertedWithCustomError(umixDeployer, "Umix__ZeroAmount")
+                  ).to.be.revertedWithCustomError(credLinkDeployer, "Credlink__ZeroAmount")
               })
           })
 
           describe("acceptLoan", function () {
               it("Should accept a loan", async function () {
-                  const { umixDeployer, owner } = await loadFixture(deployUmixFixture)
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
                   const value = ethers.parseEther("1.0")
                   const duration = 86400
-                  await umixDeployer.createLoan(ethers.ZeroAddress, value, duration, {
+                  await credLinkDeployer.createLoan(ethers.ZeroAddress, value, duration, {
                       value: value,
                       gasLimit: 5000000,
                       gasPrice: ethers.parseUnits("10", "gwei"),
                       from: owner.address,
                   })
-                  await umixDeployer.lockCollateral(ethers.ZeroAddress, value, {
+                  await credLinkDeployer.lockCollateral(ethers.ZeroAddress, value, {
                       value: value,
                       gasLimit: 5000000,
                       gasPrice: ethers.parseUnits("10", "gwei"),
                       from: owner.address,
                   })
-                  const tx = await umixDeployer.acceptLoan(owner.address, ethers.ZeroAddress, 1)
+                  const tx = await credLinkDeployer.acceptLoan(
+                      owner.address,
+                      ethers.ZeroAddress,
+                      1
+                  )
                   await tx.wait()
-                  expect(tx).to.emit(umixDeployer, "LoanAccepted")
+                  expect(tx).to.emit(credLinkDeployer, "LoanAccepted")
               })
           })
       })

@@ -20,7 +20,7 @@ export const THIRDWEB_CLIENT = createThirdwebClient({
   clientId: CLIENT_ID,
 });
 
-export const umixContract = getContract({
+export const credLinkContract = getContract({
   address: CONTRACT_ADDRESS,
   chain: etherlinkTestnet,
   client: THIRDWEB_CLIENT,

@@ -3,9 +3,9 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-const umixModule = buildModule("UmixModule", (m) => {
-    const umixDeployer = m.contract("Umix", [])
-    return { umixDeployer }
+const credLinkModule = buildModule("credLinkModule", (m) => {
+    const credlinkDeployer = m.contract("Credlink", [])
+    return { credlinkDeployer }
 })
 
-export default umixModule
+export default credLinkModule

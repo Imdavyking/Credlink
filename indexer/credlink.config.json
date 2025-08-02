@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Umix",
+  "name": "Credlink",
   "abis": {
     "ftshares": {
       "path": "./abi.json"

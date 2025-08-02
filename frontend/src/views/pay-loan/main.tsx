@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { tokens, umixContract } from "../../utils/constants";
+import { tokens, credLinkContract } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
@@ -23,7 +23,7 @@ export default function PayLoan() {
   const [lender, setLender] = useState("");
 
   const { data: balance, isLoading: balanceLoading } = useReadContract({
-    contract: umixContract,
+    contract: credLinkContract,
     method:
       "function getUserBalance(address account, address token) view returns (uint256)",
     params: [
@@ -33,7 +33,7 @@ export default function PayLoan() {
   });
 
   const { data: debt, isLoading: debtLoading } = useReadContract({
-    contract: umixContract,
+    contract: credLinkContract,
     method:
       "function debt(address borrower, address token) view returns (uint256)",
     params: [
@@ -65,7 +65,7 @@ export default function PayLoan() {
       setIsSubmitting(true);
 
       const trx = prepareContractCall({
-        contract: umixContract,
+        contract: credLinkContract,
         method:
           "function payLoan(address token, address lender, uint256 amount)",
         params: [selectedLoanToken.address, lender, toUnits(amount, 18)],

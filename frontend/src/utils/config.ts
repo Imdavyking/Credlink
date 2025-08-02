@@ -1,7 +1,7 @@
 import { BrowserProvider, ethers } from "ethers";
 import { createPublicClient, custom, defineChain } from "viem";
 import { publicActionsL2 } from "viem/op-stack";
-import abi from "../assets/json/umix.json";
+import abi from "../assets/json/credlink.json";
 import { etherlinkTestnet } from "thirdweb/chains";
 
 declare global {
@@ -9,8 +9,6 @@ declare global {
     ethereum?: any;
   }
 }
-
-export const umixInterface = new ethers.Interface(abi);
 
 export const etherlinkTestnetViem = defineChain({
   id: 128123,
