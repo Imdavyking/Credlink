@@ -1,4 +1,4 @@
-import { ethers } from "hardhat"
+import hre, { ethers } from "hardhat"
 import { verify } from "../utils/verify"
 import dotenv from "dotenv"
 import { network } from "hardhat"
@@ -6,21 +6,17 @@ import { cleanDeployments } from "../utils/clean"
 import { updateEnv } from "./update.env"
 import { copyABI } from "./copy.abi"
 import { localHardhat } from "../utils/localhardhat.chainid"
+import credLinkModule from "../ignition/modules/CredLinkDeployer"
 
 dotenv.config()
 
 async function main() {
     const chainId = network.config.chainId!
     cleanDeployments(chainId!)
-    const credLinkFactory = await ethers.getContractFactory("Credlink")
-    const [deployer] = await ethers.getSigners()
-    const tx = await deployer.sendTransaction({
-        data: credLinkFactory.bytecode,
-    })
-
     console.log("Deploying contract...")
-    const receipt = await tx.wait()
-    const credlinkAddress = receipt!.contractAddress!
+    const { credlinkDeployer } = await hre.ignition.deploy(credLinkModule)
+    await credlinkDeployer.waitForDeployment()
+    const credlinkAddress = await credlinkDeployer.getAddress()
     console.log("credLink is deployed to:", credlinkAddress)
     const chainName = process.env.CHAIN_NAME!
     const chainCurrencyName = process.env.CHAIN_CURRENCY_NAME!
