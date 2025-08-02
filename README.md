@@ -2,7 +2,7 @@
 
 ## **Overview**
 
-This is a decentralized protocol built on the **Umi** blockchain, offering **interest-free loans** backed by collateral. Inspired by the **Liquity** protocol, our goal is to provide a stable and decentralized way for users to borrow funds without the burden of interest rates, using a **collateralized debt position (CDP)** model.
+This is a decentralized protocol built on the **Etherlink** blockchain, offering **interest-free loans** backed by collateral. Inspired by the **Liquity** protocol, our goal is to provide a stable and decentralized way for users to borrow funds without the burden of interest rates, using a **collateralized debt position (CDP)** model.
 
 ### **Problem Statement**
 

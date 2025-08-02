@@ -1,6 +1,6 @@
 // import usdc from "../assets/images/usdc.png";
 import { createThirdwebClient, getContract } from "thirdweb";
-import logo from "../assets/images/umi.svg";
+import logo from "../assets/images/etherlink.svg";
 import { ethers } from "ethers";
 import { etherlinkTestnet } from "thirdweb/chains";
 export const tokens = [
