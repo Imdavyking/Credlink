@@ -3,7 +3,7 @@ import logo from "../assets/images/umi.svg";
 import { ethers } from "ethers";
 export const tokens = [
   {
-    name: "ETH",
+    name: "XTZ",
     address: ethers.ZeroAddress,
     image: logo,
   },

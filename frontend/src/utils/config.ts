@@ -1,4 +1,3 @@
-import { BCS, getRustConfig } from "@benfen/bcs";
 import { BrowserProvider, ethers } from "ethers";
 import {
   createPublicClient,
@@ -12,35 +11,18 @@ import { CONTRACT_ADDRESS } from "./constants";
 
 export const umixInterface = new ethers.Interface(abi);
 
-const bcs = new BCS(getRustConfig());
-bcs.registerEnumType("SerializableTransactionData", {
-  EoaBaseTokenTransfer: "",
-  ScriptOrDeployment: "",
-  EntryFunction: "",
-  L2Contract: "",
-  EvmContract: "Vec<u8>",
-});
-
-const serializeFunction = (data: string): `0x${string}` => {
-  const code = Uint8Array.from(Buffer.from(data.replace("0x", ""), "hex"));
-  const evmContract = bcs.ser("SerializableTransactionData", {
-    EvmContract: code,
-  });
-  return `0x${evmContract.toString("hex")}`;
-};
-
 export const umiDevnet = defineChain({
   id: 128123,
   sourceId: 128123,
-  name: "Umi",
+  name: "XTZ",
   nativeCurrency: {
     decimals: 18,
-    name: "Ether",
-    symbol: "ETH",
+    name: "Etherlink Testnet",
+    symbol: "XTZ",
   },
   rpcUrls: {
     default: {
-      http: ["https://devnet.uminetwork.com"],
+      http: ["https://node.ghostnet.etherlink.com"],
     },
   },
 });
@@ -138,6 +120,6 @@ export const getFunction = async (name: string, ...args: any[]) => {
 
   return {
     to: tx.to as `0x${string}`,
-    data: serializeFunction(tx.data),
+    data: tx.data,
   };
 };
