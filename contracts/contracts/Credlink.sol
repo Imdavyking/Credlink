@@ -166,6 +166,14 @@ contract Credlink is Ownable {
         transferOwnership(newOwner);
     }
 
+    function getUserBalance(address account, address token) public view returns (uint256) {
+        if (token == address(0)) {
+            return account.balance;
+        } else {
+            return IERC20(token).balanceOf(account);
+        }
+    }
+
     function getUserLoans(address borrower) external view returns (Loan[] memory) {
         return activeLoans[borrower];
     }
