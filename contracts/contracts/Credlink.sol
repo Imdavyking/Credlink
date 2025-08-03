@@ -41,11 +41,18 @@ contract Credlink is Ownable {
         address indexed collateralToken,
         uint256 amount
     );
+    event LenderLiquidityUpdated(
+        address indexed lender,
+        address indexed token,
+        uint256 availableAmount
+    );
+    event LiquidityWithdrawn(address indexed lender, address indexed token, uint256 amount);
 
     mapping(address => mapping(address => uint256)) public collateral;
     mapping(address => mapping(address => uint256)) public debt;
     mapping(address => mapping(address => uint256)) public liquidityPool;
     mapping(address => Loan[]) public activeLoans;
+    mapping(address => bool) public autoRecycleEnabled;
 
     address public ETHERLINK_TESTNET_USDT = 0xf7f007dc8Cb507e25e8b7dbDa600c07FdCF9A75B;
 
@@ -58,6 +65,10 @@ contract Credlink is Ownable {
     }
 
     constructor() Ownable(msg.sender) {}
+
+    function setAutoRecycle(bool enabled) external {
+        autoRecycleEnabled[msg.sender] = enabled;
+    }
 
     function createLoan(address token, uint256 amount, uint256 duration) external payable {
         if (amount == 0) revert Credlink__ZeroAmount();
@@ -73,6 +84,7 @@ contract Credlink is Ownable {
         }
 
         emit LoanCreated(msg.sender, token, amount);
+        emit LenderLiquidityUpdated(msg.sender, token, liquidityPool[msg.sender][token]);
     }
 
     function lockCollateral(address collateralToken, uint256 collateralAmount) external payable {
@@ -109,28 +121,68 @@ contract Credlink is Ownable {
         }
 
         emit LoanAccepted(msg.sender, lender, token, amount, token, currentCollateral);
+        emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
+    }
+
+    function withdrawLiquidity(address token, uint256 amount) external {
+        uint256 available = liquidityPool[msg.sender][token];
+        if (amount == 0 || amount > available) revert Credlink__InsufficientLiquidity();
+
+        liquidityPool[msg.sender][token] -= amount;
+
+        if (token == address(0)) {
+            (bool sent, ) = payable(msg.sender).call{value: amount}("");
+            if (!sent) revert Credlink__TransferFailed();
+        } else {
+            IERC20(token).safeTransfer(msg.sender, amount);
+        }
+
+        emit LiquidityWithdrawn(msg.sender, token, amount);
+        emit LenderLiquidityUpdated(msg.sender, token, liquidityPool[msg.sender][token]);
     }
 
     function payLoan(address token, address lender, uint256 amount) external payable {
         uint256 currentDebt = debt[msg.sender][token];
         if (currentDebt < amount) revert Credlink__RepaymentExceedsDebt();
 
+        // ETH case
         if (token == address(0)) {
             if (msg.value != amount) revert Credlink__PaymentMismatch();
-            payable(lender).transfer(amount);
+
+            if (autoRecycleEnabled[lender]) {
+                liquidityPool[lender][token] += amount;
+                emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
+            } else {
+                (bool sent, ) = payable(lender).call{value: amount}("");
+                if (!sent) revert Credlink__TransferFailed();
+            }
+
+            // ERC20 case
         } else {
             if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
-            IERC20(token).safeTransferFrom(msg.sender, lender, amount);
+
+            // Transfer to this contract first
+            IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+
+            if (autoRecycleEnabled[lender]) {
+                liquidityPool[lender][token] += amount;
+                emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
+            } else {
+                IERC20(token).safeTransfer(lender, amount);
+            }
         }
 
+        // Update debt
         debt[msg.sender][token] -= amount;
 
+        // Release collateral if debt is fully repaid
         if (debt[msg.sender][token] == 0) {
             uint256 colAmount = collateral[msg.sender][token];
             collateral[msg.sender][token] = 0;
 
             if (token == address(0)) {
-                payable(msg.sender).transfer(colAmount);
+                (bool sentCol, ) = payable(msg.sender).call{value: colAmount}("");
+                if (!sentCol) revert Credlink__TransferFailed();
             } else {
                 IERC20(token).safeTransfer(msg.sender, colAmount);
             }
