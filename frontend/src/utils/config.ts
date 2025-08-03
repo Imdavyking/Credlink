@@ -1,7 +1,6 @@
 import { BrowserProvider, ethers } from "ethers";
 import { createPublicClient, custom, defineChain } from "viem";
 import { publicActionsL2 } from "viem/op-stack";
-import abi from "../assets/json/credlink.json";
 import { etherlinkTestnet } from "thirdweb/chains";
 
 declare global {
