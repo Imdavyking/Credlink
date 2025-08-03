@@ -1,0 +1,7 @@
+{
+  "network": "etherlinkTest",
+  "address": "0x8A8375aCc1862cEE532373f1AcC6BAADCa8dd0e0",
+  "startBlock": 20902888,
+  "file": "credlink",
+  "lenderLiquidityUpdateEvent": "LenderLiquidityUpdated(indexed address,indexed address,uint256)"
+}
