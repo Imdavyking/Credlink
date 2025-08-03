@@ -1,12 +1,13 @@
 // import usdc from "../assets/images/usdc.png";
 import { createThirdwebClient, getContract } from "thirdweb";
-import logo from "../assets/images/etherlink.svg";
+import logo from "../assets/images/etherlink.jpg";
 import { ethers } from "ethers";
 import { etherlinkTestnet } from "thirdweb/chains";
+export const NATIVE_TOKEN_ADDRESS = ethers.ZeroAddress;
 export const tokens = [
   {
     name: "XTZ",
-    address: ethers.ZeroAddress,
+    address: NATIVE_TOKEN_ADDRESS,
     image: logo,
   },
 ];
@@ -25,3 +26,7 @@ export const credLinkContract = getContract({
   chain: etherlinkTestnet,
   client: THIRDWEB_CLIENT,
 });
+
+export const isNativeTokenAddressCred = (address: string) => {
+  return address.toLowerCase() === NATIVE_TOKEN_ADDRESS.toLowerCase();
+};

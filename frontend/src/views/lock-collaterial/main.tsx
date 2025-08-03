@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { tokens, credLinkContract } from "../../utils/constants";
+import { tokens, credLinkContract, isNativeTokenAddressCred } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
@@ -28,6 +28,9 @@ export default function LockCollateral() {
       address ?? "0x0000000000000000000000000000000000000000",
       selectedToken.address,
     ],
+    value: isNativeTokenAddressCred(selectedToken.address)
+      ? toUnits(amount, 18)
+      : undefined,
   });
 
   const handleLockCollateral = async (e: React.FormEvent) => {

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { tokens, credLinkContract } from "../../utils/constants";
+import {
+  tokens,
+  credLinkContract,
+  isNativeTokenAddressCred,
+} from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
@@ -69,6 +73,9 @@ export default function PayLoan() {
         method:
           "function payLoan(address token, address lender, uint256 amount)",
         params: [selectedLoanToken.address, lender, toUnits(amount, 18)],
+        value: isNativeTokenAddressCred(selectedLoanToken.address)
+          ? toUnits(amount, 18)
+          : undefined,
       });
 
       await sendAndConfirmTransaction({

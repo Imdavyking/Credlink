@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { tokens, credLinkContract } from "../../utils/constants";
+import {
+  tokens,
+  credLinkContract,
+  isNativeTokenAddressCred,
+} from "../../utils/constants";
 import { toast } from "react-toastify";
 
 import SubmitButton from "../../components/SubmitButton";
@@ -59,6 +63,9 @@ export default function CreateLoan() {
         method:
           "function createLoan(address token, uint256 amount, uint256 duration)",
         params: [selectedToken.address, toUnits(amount, 18), BigInt(duration)],
+        value: isNativeTokenAddressCred(selectedToken.address)
+          ? toUnits(amount, 18)
+          : undefined,
       });
 
       await sendAndConfirmTransaction({

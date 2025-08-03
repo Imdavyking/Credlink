@@ -5,12 +5,11 @@ import CreateLoan from "../views/create-loan/main";
 import AcceptLoanForm from "../views/accept-loan/main";
 import PayLoan from "../views/pay-loan/main";
 import LockCollaterial from "../views/lock-collaterial/main";
-import SolHome from "../views/sol-home/main";
 function Router() {
   const routes = [
     {
       path: "/",
-      element: <SolHome />,
+      element: <Home />,
     },
     {
       path: "*",
