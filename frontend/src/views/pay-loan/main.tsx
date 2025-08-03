@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   tokens,
-  credLinkContract,
+  credLinkThirdWeb,
   isNativeTokenAddressCred,
 } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
@@ -27,7 +27,7 @@ export default function PayLoan() {
   const [lender, setLender] = useState("");
 
   const { data: balance, isLoading: balanceLoading } = useReadContract({
-    contract: credLinkContract,
+    contract: credLinkThirdWeb,
     method:
       "function getUserBalance(address account, address token) view returns (uint256)",
     params: [
@@ -37,7 +37,7 @@ export default function PayLoan() {
   });
 
   const { data: debt, isLoading: debtLoading } = useReadContract({
-    contract: credLinkContract,
+    contract: credLinkThirdWeb,
     method:
       "function debt(address borrower, address token) view returns (uint256)",
     params: [
@@ -69,7 +69,7 @@ export default function PayLoan() {
       setIsSubmitting(true);
 
       const trx = prepareContractCall({
-        contract: credLinkContract,
+        contract: credLinkThirdWeb,
         method:
           "function payLoan(address token, address lender, uint256 amount)",
         params: [selectedLoanToken.address, lender, toUnits(amount, 18)],

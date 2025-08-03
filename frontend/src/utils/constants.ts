@@ -4,6 +4,7 @@ import logo from "../assets/images/etherlink.jpg";
 import { ethers } from "ethers";
 import { etherlinkTestnet } from "thirdweb/chains";
 import credLinkAbi from "../assets/json/credlink.json";
+
 export const NATIVE_TOKEN_ADDRESS = ethers.ZeroAddress;
 export const tokens = [
   {
@@ -22,7 +23,7 @@ export const THIRDWEB_CLIENT = createThirdwebClient({
   clientId: CLIENT_ID,
 });
 
-export const credLinkContract = getContract({
+export const credLinkThirdWeb = getContract({
   abi: credLinkAbi as any,
   address: CONTRACT_ADDRESS,
   chain: etherlinkTestnet,

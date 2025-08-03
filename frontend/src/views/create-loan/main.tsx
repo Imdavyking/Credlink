@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   tokens,
-  credLinkContract,
+  credLinkThirdWeb,
   isNativeTokenAddressCred,
 } from "../../utils/constants";
 import { toast } from "react-toastify";
@@ -27,7 +27,7 @@ export default function CreateLoan() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: balanceData, isLoading: balanceLoading } = useReadContract({
-    contract: credLinkContract,
+    contract: credLinkThirdWeb,
     method:
       "function getUserBalance(address account, address token) view returns (uint256)",
     params: [
@@ -59,7 +59,7 @@ export default function CreateLoan() {
       setIsSubmitting(true);
 
       const trx = prepareContractCall({
-        contract: credLinkContract,
+        contract: credLinkThirdWeb,
         method:
           "function createLoan(address token, uint256 amount, uint256 duration)",
         params: [selectedToken.address, toUnits(amount, 18), BigInt(duration)],

@@ -1,69 +1,65 @@
 # **CredLink: Interest-Free P2P Lending Protocol**
 
-## **Overview**
+## Overview
 
-This is a decentralized protocol built on the **Etherlink** blockchain, offering **interest-free loans** backed by collateral. Inspired by the **Liquity** protocol, our goal is to provide a stable and decentralized way for users to borrow funds without the burden of interest rates, using a **collateralized debt position (CDP)** model.
+CredLink is a decentralized lending protocol built on the **Etherlink** blockchain, offering **interest-free loans** backed by collateral. Inspired by the Liquity protocol, CredLink provides a stable and decentralized way for users to borrow funds without interest, using a **collateralized debt position (CDP)** model.
 
-### **Problem Statement**
+## Problem Statement
 
-Traditional lending often involves high interest rates, adding significant financial strain on borrowers. This protocol aims to provide a better alternative by offering **interest-free loans** while maintaining protocol stability through a **collateralized** mechanism.
+Traditional lending platforms impose high interest rates, creating significant financial burdens for borrowers. CredLink addresses this by enabling interest-free loans secured with collateral, maintaining protocol stability and user security.
 
----
+## How It Works
 
-## **How It Works**
+Users lock collateral to borrow stablecoins without interest. The protocol ensures solvency by requiring the collateral to exceed the loan value by a minimum collateral ratio (e.g., 150%). If the collateral value falls below this ratio, it may be liquidated to repay the loan.
 
-The protocol enables users to **borrow stablecoins** without paying interest by locking collateral. The loan is secured by the collateral, and if the value of the collateral falls below a set threshold, it can be liquidated to repay the loan. This ensures that the protocol remains solvent without charging interest to borrowers.
+### Core Features
 
-### **Core Features**
+- **Interest-Free Loans**: Borrow stablecoins without paying interest.
+- **Collateralized Debt Positions (CDPs)**: Loans are backed by locked collateral.
+- **Liquidation Mechanism**: Collateral is liquidated if the collateral ratio is breached.
+- **Stability Pool**: Maintains protocol health by absorbing liquidated collateral.
 
-- **Interest-Free Loans**: Loans are offered without interest, relying on collateral to secure the loan value.
-- **Collateralized Debt Positions (CDPs)**: Users lock collateral to take out loans. The collateral value must exceed the loan amount by a predetermined ratio (e.g., 110%).
-- **Liquidation Mechanism**: If the collateral value drops below the required threshold, it is liquidated to repay the loan.
-- **Stability Pool**: A reserve pool that absorbs liquidated collateral to maintain the protocol's stability.
+## How to Use
 
----
+### Borrowers
 
-## **How to Use**
+1. Lock collateral (e.g., XTZ or other tokens).
+2. Request a loan amount in stablecoins.
+3. Maintain your collateral ratio to avoid liquidation.
+4. Repay the loan to unlock your collateral.
 
-### **For Borrowers**
+### Lenders
 
-1. Deposit collateral (e.g., ETH) to secure a loan.
-2. Specify the amount you wish to borrow (in stablecoins).
-3. Borrow funds at no interest, ensuring your collateral remains above the required ratio.
-4. Repay the loan when ready to unlock your collateral.
+1. Provide liquidity by depositing tokens into the protocol.
+2. Support the stability pool to absorb liquidation risk.
+3. Earn rewards from liquidation fees and protocol incentives.
 
-### **For Lenders**
+## Tech Stack & Limitations
 
-1. Provide collateral to the **Stability Pool**.
-2. Earn rewards through **liquidation fees** or other incentives for participating in the protocol.
-3. Help maintain protocol stability by absorbing collateral when borrowers fail to maintain collateral ratios.
+- **Thirdweb**: Used for wallet connection and contract interaction, streamlining the dApp experience on Etherlink.
+- **Goldsky**: Implemented for indexing contract data and events off-chain, enabling efficient querying.
+- **Redstone Oracle**: Planned for real-time price feeds. However, due to a version mismatch (Redstone uses ethers v5, Thirdweb uses ethers v6), integration was not possible in this release. This is a key area for future upgrades.
 
----
+## Future Improvements
 
-## **Future Improvements**
+- Implement decentralized governance for protocol parameters.
+- Add support for multiple collateral types and dynamic collateral ratios.
+- Develop a collateral-backed token to enhance protocol stability.
 
-- **Governance**: Introduce decentralized governance to allow users to vote on protocol changes (e.g., adjusting collateral ratios).
-- **Interest-free Loan Modifications**: Implement more advanced mechanisms to reduce liquidation risks, such as multiple collateral types or a dynamic collateral ratio.
-- **Collateralized Token**: Introduce a new collateral-backed token for additional stability.
+## Contributing
 
----
+We welcome contributions! To contribute:
 
-## **Contributing**
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes.
+4. Submit a pull request.
 
-We welcome contributions! If you’d like to contribute to this project, please fork the repository and submit a pull request.
+## License
 
-1. Fork the repository
-2. Create a new branch for your changes
-3. Make your changes
-4. Submit a pull request
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## **License**
+## Acknowledgments
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## **Acknowledgments**
-
-- Inspired by **Liquity Protocol** (interest-free loan model).
-- Built using **Solidity** for decentralized smart contracts.
+- Inspired by the **Liquity Protocol**’s interest-free lending model.
+- Built using **Solidity** for smart contracts and **Thirdweb** for front-end wallet integration.

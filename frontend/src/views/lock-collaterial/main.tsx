@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { tokens, credLinkContract, isNativeTokenAddressCred } from "../../utils/constants";
+import {
+  tokens,
+  credLinkThirdWeb,
+  isNativeTokenAddressCred,
+} from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
@@ -21,7 +25,7 @@ export default function LockCollateral() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: balance, isLoading: loadingBalance } = useReadContract({
-    contract: credLinkContract,
+    contract: credLinkThirdWeb,
     method:
       "function getUserBalance(address account, address token) view returns (uint256)",
     params: [
@@ -50,7 +54,7 @@ export default function LockCollateral() {
       setIsSubmitting(true);
 
       const trx = prepareContractCall({
-        contract: credLinkContract,
+        contract: credLinkThirdWeb,
         method: "function lockCollateral(address token, uint256 amount)",
         params: [selectedToken.address, toUnits(amount, 18)],
       });
