@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+description: Credlink
+repository: https://github.com/Imdavyking/Credlink
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: credlink
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: credlink
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - LenderLiquidityUpdated
+      abis:
+        - name: credlink
+          file: ./abis/{{ file }}.json
+      eventHandlers:
+        - event: {{ lenderLiquidityUpdateEvent }}
+          handler: handleLenderLiquidityUpdate
+      file: ./src/mapping.ts

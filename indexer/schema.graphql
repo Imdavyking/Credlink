@@ -1,0 +1,9 @@
+type LenderLiquidityUpdated @entity {
+  id: ID! # Unique ID for each event entity
+  lender: Bytes! # Indexed lender address
+  token: Bytes! # Indexed token address
+  availableAmount: BigInt! # Amount of liquidity available
+  blockNumber: BigInt! # Block number when event emitted (optional but useful)
+  transactionHash: Bytes! # Transaction hash (optional but useful)
+  timestamp: BigInt! # Timestamp of the block (optional but useful)
+}

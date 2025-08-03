@@ -7,6 +7,7 @@ import { updateEnv } from "./update.env"
 import { copyABI } from "./copy.abi"
 import { localHardhat } from "../utils/localhardhat.chainid"
 import credLinkModule from "../ignition/modules/CredLinkDeployer"
+import { saveJSONConfig } from "./indexer.save"
 
 dotenv.config()
 
@@ -29,18 +30,24 @@ async function main() {
     const blockNumber = await ethers.provider.getBlockNumber()
     const rpcUrl = (network.config as any).url
     const blockExplorerUrl = network.config.ignition.explorerUrl!
+    const abiFile = "credlink"
+
+    const indexerConfig = {
+        network: "etherlinkTest",
+        address: credlinkAddress,
+        startBlock: blockNumber,
+        file: abiFile,
+        lenderLiquidityUpdateEvent:
+            "LenderLiquidityUpdated(indexed address,indexed address,uint256)",
+    }
     /** contract address */
     updateEnv(credlinkAddress, "frontend", "VITE_CONTRACT_ADDRESS")
-    updateEnv(credlinkAddress, "indexer", "CONTRACT_ADDRESS")
 
-    /** block number */
-    updateEnv(blockNumber.toString(), "indexer", "BLOCK_NUMBER")
     /** chainid */
     updateEnv(chainId!.toString()!, "frontend", "VITE_CHAIN_ID")
     updateEnv(chainId!.toString()!, "indexer", "CHAIN_ID")
     /** rpc url */
     updateEnv(rpcUrl, "frontend", "VITE_RPC_URL")
-    updateEnv(rpcUrl, "indexer", "RPC_URL")
     /** block explorer url (3091) */
     updateEnv(blockExplorerUrl, "frontend", "VITE_CHAIN_BLOCKEXPLORER_URL")
     /** update chain name */
@@ -50,8 +57,10 @@ async function main() {
     /** update chain currency name */
     updateEnv(chainSymbol, "frontend", "VITE_CHAIN_SYMBOL")
 
-    copyABI("Credlink", "frontend/src/assets/json", "credlink")
-    copyABI("Credlink", "indexer/abis", "credlink")
+    copyABI("Credlink", "frontend/src/assets/json", abiFile)
+    copyABI("Credlink", "indexer/abis", abiFile)
+
+    saveJSONConfig(indexerConfig, "indexer/config", "etherlink.json")
 }
 
 main().catch(console.error)

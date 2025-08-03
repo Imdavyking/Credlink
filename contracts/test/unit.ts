@@ -61,6 +61,37 @@ typeof chainId !== "undefined" && !localHardhat.includes(chainId)
               })
           })
 
+          describe("can withdraw liquidity if not borrowed", function () {
+              it("Should allow owner to withdraw liquidity if not borrowed", async function () {
+                  const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
+                  const value = ethers.parseEther("1.0")
+                  const duration = 86400
+                  const tx = await credLinkDeployer.createLoan(
+                      ethers.ZeroAddress,
+                      value,
+                      duration,
+                      {
+                          value: value,
+                          gasLimit: 5000000,
+                          gasPrice: ethers.parseUnits("10", "gwei"),
+                          from: owner.address,
+                      }
+                  )
+                  await tx.wait()
+                  const withdrawTx = await credLinkDeployer.withdrawLiquidity(
+                      ethers.ZeroAddress,
+                      value, // Withdraw more than created loan amount
+                      {
+                          gasLimit: 5000000,
+                          gasPrice: ethers.parseUnits("10", "gwei"),
+                          from: owner.address,
+                      }
+                  )
+                  await withdrawTx.wait()
+                  expect(withdrawTx).to.emit(credLinkDeployer, "LiquidityWithdrawn")
+              })
+          })
+
           describe("createLoan with zero amount", function () {
               it("Should fail to create a loan with zero amount", async function () {
                   const { credLinkDeployer, owner } = await loadFixture(deployCredlinkFixture)
