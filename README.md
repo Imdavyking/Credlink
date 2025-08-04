@@ -10,11 +10,11 @@ Traditional lending platforms impose high interest rates, creating significant f
 
 ## How It Works
 
-Users lock collateral to borrow stablecoins without interest. The protocol ensures solvency by requiring the collateral to exceed the loan value by a minimum collateral ratio (e.g., 150%). If the collateral value falls below this ratio, it may be liquidated to repay the loan.
+Users lock collateral to borrow XTZ or stablecoins without interest. The protocol ensures solvency by requiring the collateral to exceed the loan value by a minimum collateral ratio (e.g., 150%). If the collateral value falls below this ratio, it may be liquidated to repay the loan.
 
 ### Core Features
 
-- **Interest-Free Loans**: Borrow stablecoins without paying interest.
+- **Interest-Free Loans**: Borrow XTZ or stablecoins without paying interest.
 - **Collateralized Debt Positions (CDPs)**: Loans are backed by locked collateral.
 - **Liquidation Mechanism**: Collateral is liquidated if the collateral ratio is breached.
 - **Stability Pool**: Maintains protocol health by absorbing liquidated collateral.
