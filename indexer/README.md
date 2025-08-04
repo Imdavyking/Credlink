@@ -57,7 +57,7 @@ yarn build
 ### Step 5: Deploy to Goldsky
 
 ```bash
-yarn goldsky:deploy:etherlink
+VERSION=1.0.0 yarn goldsky:deploy:etherlink # use your version
 ```
 
 ---

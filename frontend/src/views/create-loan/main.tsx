@@ -41,12 +41,12 @@ export default function CreateLoan() {
     e.preventDefault();
 
     if (!amount || Number(amount) <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error("Amount must be greater than 0");
       return;
     }
 
-    if (!duration || Number(duration) <= 0) {
-      toast.error("Please enter a valid duration");
+    if (!duration || Number(duration) <= 1) {
+      toast.error("Duration must be at least 1 day");
       return;
     }
 

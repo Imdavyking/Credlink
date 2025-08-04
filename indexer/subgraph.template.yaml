@@ -17,10 +17,13 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - LenderLiquidityUpdated
+        - LoanBorrowed
       abis:
         - name: credlink
           file: ./abis/{{ file }}.json
       eventHandlers:
         - event: {{ lenderLiquidityUpdateEvent }}
           handler: handleLenderLiquidityUpdate
+        - event: {{ loanBorrowedEvent }}
+          handler: handleLoanBorrowed
       file: ./src/mapping.ts

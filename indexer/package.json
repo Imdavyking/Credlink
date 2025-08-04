@@ -5,7 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare:etherlink": "mustache config/etherlink.json subgraph.template.yaml > subgraph.yaml",
-    "goldsky:deploy:etherlink": "goldsky subgraph deploy credlink/1.0.0 --path .",
+    "goldsky:deploy:etherlink": "goldsky subgraph deploy credlink/$VERSION --path .",
     "deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ poap-xyz/poap",
     "deploy:xdai": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ poap-xyz/poap-xdai",
     "deploy:chiado": "goldsky subgraph deploy poap-xyz/poap-chiado",

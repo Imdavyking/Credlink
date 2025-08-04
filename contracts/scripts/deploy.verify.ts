@@ -39,6 +39,7 @@ async function main() {
         file: abiFile,
         lenderLiquidityUpdateEvent:
             "LenderLiquidityUpdated(indexed address,indexed address,uint256)",
+        loanBorrowedEvent: "LoanBorrowed(indexed address,indexed address,indexed address,uint256)",
     }
     /** contract address */
     updateEnv(credlinkAddress, "frontend", "VITE_CONTRACT_ADDRESS")
