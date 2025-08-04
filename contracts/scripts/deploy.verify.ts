@@ -33,7 +33,7 @@ async function main() {
     const abiFile = "credlink"
 
     const indexerConfig = {
-        network: "etherlinkTest",
+        network: "etherlink-testnet",
         address: credlinkAddress,
         startBlock: blockNumber,
         file: abiFile,
