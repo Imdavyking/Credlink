@@ -7,15 +7,16 @@ const PAGE_SIZE = 10;
 
 const GET_LOANS = gql`
   query GetLoans($first: Int!, $skip: Int!) {
-    lenderLiquidityUpdateds(
+    loanBorroweds(
       first: $first
       skip: $skip
-      where: { availableAmount_gt: "0" }
+      where: { amount_gt: "0" }
     ) {
       id
+      borrower
       lender
       token
-      availableAmount
+      amount
     }
   }
 `;
@@ -36,7 +37,7 @@ function formatAmount(amount: string) {
   return num.toLocaleString(undefined, { maximumFractionDigits: 4 });
 }
 
-export default function LenderLoanList() {
+export default function BorrowerLoanList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
   const offset = (page - 1) * PAGE_SIZE;

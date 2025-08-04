@@ -8,10 +8,10 @@ const NavHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const links = [
-    { to: "/create-loan", label: "Create" },
-    { to: "/loan-list", label: "Loans" },
-    { to: "/pay-loan", label: "Pay" },
-    { to: "/lock-collateral", label: "Lock" },
+    { to: "/create-loan", label: "Create Loan" },
+    { to: "/available-loans", label: "Available Loans" },
+    { to: "/my-loans", label: "My Loans" },
+    { to: "/lock-collateral", label: "Lock Collateral" },
   ];
 
   const renderLinks = (isMobile = false) =>
