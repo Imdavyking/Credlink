@@ -34,7 +34,7 @@ Users lock collateral to borrow stablecoins without interest. The protocol ensur
 2. Support the stability pool to absorb liquidation risk.
 3. Earn rewards from liquidation fees and protocol incentives.
 
-## Tech Stack & Limitations
+## Sponsors Tech Stack & Limitations
 
 - **Thirdweb**: Used for wallet connection and contract interaction, streamlining the dApp experience on Etherlink.
 - **Goldsky**: Implemented for indexing contract data and events off-chain, enabling efficient querying.
