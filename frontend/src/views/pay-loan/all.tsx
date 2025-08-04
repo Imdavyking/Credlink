@@ -53,7 +53,7 @@ export default function BorrowerLoanList() {
 
   useEffect(() => {
     refetch({ first: PAGE_SIZE, skip: offset });
-  }, [page, offset, refetch]);
+  }, [page, offset, refetch, address]);
 
   const loans = data?.lenderLiquidityUpdateds ?? [];
   const totalCount = data?.lenderLiquidityUpdatedsConnection?.totalCount || 0;
