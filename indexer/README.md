@@ -2,6 +2,8 @@
 
 This subgraph indexes the `Credlink` smart contract deployed on **Etherlink Testnet**, capturing real-time lending data such as available liquidity per lender and token via the `LenderLiquidityUpdated` event.
 
+> 🛠 **This subgraph is powered by [Goldsky](https://goldsky.com), a fast and reliable Web3 data indexing platform.**
+
 ---
 
 ## 📦 Setup & Deployment
@@ -89,5 +91,6 @@ https://api.goldsky.com/api/public/project_<your_project_id>/subgraphs/credlink/
 
 - This subgraph indexes the `LenderLiquidityUpdated` event from Credlink to track active liquidity positions.
 - It enables frontend apps to query real-time lending pool availability.
+- 📡 **Goldsky** provides reliable, performant indexing — ideal for fast and scalable dApps.
 
 ---
