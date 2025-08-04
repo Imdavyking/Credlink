@@ -22,7 +22,6 @@ async function main() {
     const chainName = process.env.CHAIN_NAME!
     const chainCurrencyName = process.env.CHAIN_CURRENCY_NAME!
     const chainSymbol = process.env.CHAIN_SYMBOL!
-    console.log(`credLink deployed to: ${credlinkAddress}`)
     await verify(credlinkAddress, [])
 
     if (typeof chainId !== "undefined" && localHardhat.includes(chainId)) return
