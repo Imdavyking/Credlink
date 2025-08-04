@@ -51,7 +51,7 @@ export default function LenderLoanList() {
   }, [page, offset, refetch]);
 
   const loans = data?.lenderLiquidityUpdateds ?? [];
-  const totalCount = data?.lenderLiquidityUpdatedsConnection?.totalCount || 0;
+  const totalCount = data?.lenderLiquidityUpdateds?.length || 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const goToPage = (newPage: number) => {

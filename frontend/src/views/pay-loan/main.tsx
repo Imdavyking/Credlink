@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   tokens,
   credLinkThirdWeb,
@@ -21,10 +22,43 @@ export default function PayLoan() {
   const activeAccount = useActiveAccount();
   const address = activeAccount?.address;
 
+  const [searchParams] = useSearchParams();
+  const lenderFromQuery = searchParams.get("lender") || "";
+
   const [amount, setAmount] = useState("");
   const [selectedLoanToken, setSelectedLoanToken] = useState(tokens[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [lender, setLender] = useState("");
+  const [lender, setLender] = useState(lenderFromQuery);
+
+  // Update lender if query param changes
+  useEffect(() => {
+    if (lenderFromQuery) {
+      setLender(lenderFromQuery);
+    }
+  }, [lenderFromQuery]);
+
+  // Update selected token if token param present
+  const tokenFromQuery = searchParams.get("token");
+  useEffect(() => {
+    if (tokenFromQuery) {
+      const tokenMatch = tokens.find(
+        (t) => t.address.toLowerCase() === tokenFromQuery.toLowerCase()
+      );
+      if (tokenMatch) {
+        setSelectedLoanToken(tokenMatch);
+      }
+    }
+  }, [tokenFromQuery]);
+
+  const amountFromQuery = searchParams.get("amount");
+  useEffect(() => {
+    if (amountFromQuery) {
+      const parsedAmount = parseFloat(amountFromQuery);
+      if (!isNaN(parsedAmount) && parsedAmount > 0) {
+        setAmount((parsedAmount / 10 ** 18).toString());
+      }
+    }
+  }, [amountFromQuery]);
 
   const { data: balance, isLoading: balanceLoading } = useReadContract({
     contract: credLinkThirdWeb,
@@ -46,12 +80,6 @@ export default function PayLoan() {
     ],
   });
 
-  useEffect(() => {
-    if (address) {
-      setLender(address); // You can customize this if lender is different
-    }
-  }, [address]);
-
   const handlePayLoan = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -65,10 +93,15 @@ export default function PayLoan() {
       return;
     }
 
+    if (!lender) {
+      toast.error("Lender address not found");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
-      const trx = prepareContractCall({
+      const trx = await prepareContractCall({
         contract: credLinkThirdWeb,
         method:
           "function payLoan(address token, address lender, uint256 amount)",
@@ -100,9 +133,9 @@ export default function PayLoan() {
         <TextInput
           label="Lender Address"
           defaultValue={lender}
-          onChange={() => {}}
           placeholder="0xLender..."
           disabled
+          onChange={() => {}}
         />
 
         <TokenDropdown

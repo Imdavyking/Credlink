@@ -55,8 +55,8 @@ export default function BorrowerLoanList() {
     refetch({ first: PAGE_SIZE, skip: offset });
   }, [page, offset, refetch, address]);
 
-  const loans = data?.lenderLiquidityUpdateds ?? [];
-  const totalCount = data?.lenderLiquidityUpdatedsConnection?.totalCount || 0;
+  const loans = data?.loanBorroweds ?? [];
+  const totalCount = data?.loanBorroweds?.length || 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   const goToPage = (newPage: number) => {
@@ -66,19 +66,17 @@ export default function BorrowerLoanList() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-4">
-      <h2 className="text-2xl font-bold text-gray-800">
-        Available Loan Offers
-      </h2>
+      <h2 className="text-2xl font-bold text-gray-800">My Loans</h2>
 
       {loading && (
-        <p className="text-center text-gray-500">Loading loan offers...</p>
+        <p className="text-center text-gray-500">Loading My Loans...</p>
       )}
       {error && (
         <p className="text-center text-red-500">Error loading loans.</p>
       )}
 
       {!loading && loans.length === 0 && (
-        <p className="text-gray-600">No available loans at the moment.</p>
+        <p className="text-gray-600">You have not borrowed any loan yet.</p>
       )}
 
       {loans.map((loan: any) => (
@@ -100,17 +98,17 @@ export default function BorrowerLoanList() {
             </div>
 
             <div>
-              <p className="text-sm text-gray-500">Available</p>
+              <p className="text-sm text-gray-500">Amount</p>
               <p className="text-green-600 font-semibold">
-                {formatAmount(loan.availableAmount)}
+                {formatAmount(loan.amount)}
               </p>
             </div>
 
             <Link
-              to={`/accept-loan?lender=${loan.lender}&token=${loan.token}&amount=${loan.availableAmount}`}
+              to={`/pay-loan?lender=${loan.lender}&token=${loan.token}&amount=${loan.amount}`}
               className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
             >
-              Accept Loan
+              Pay Loan
             </Link>
           </div>
         </div>

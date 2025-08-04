@@ -59,7 +59,7 @@ contract Credlink is Ownable, ReentrancyGuard {
     mapping(address => mapping(address => uint256)) public debt;
     mapping(address => mapping(address => uint256)) public liquidityPool;
     mapping(address => Loan[]) public activeLoans;
-    mapping(address => bool) public autoRecycleEnabled;
+    mapping(address => bool) public autoRecycleOff;
     mapping(address borrower => mapping(address lender => mapping(address token => uint256 amount)))
         public debtBorrowerLenderToken;
 
@@ -76,7 +76,7 @@ contract Credlink is Ownable, ReentrancyGuard {
     constructor() Ownable(msg.sender) {}
 
     function setAutoRecycle(bool enabled) external {
-        autoRecycleEnabled[msg.sender] = enabled;
+        autoRecycleOff[msg.sender] = enabled;
     }
 
     function createLoan(
@@ -184,23 +184,23 @@ contract Credlink is Ownable, ReentrancyGuard {
         if (token == address(0)) {
             if (msg.value != amount) revert Credlink__PaymentMismatch();
 
-            if (autoRecycleEnabled[lender]) {
-                liquidityPool[lender][token] += amount;
-                emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
-            } else {
+            if (autoRecycleOff[lender]) {
                 (bool sent, ) = payable(lender).call{value: amount}("");
                 if (!sent) revert Credlink__TransferFailed();
+            } else {
+                liquidityPool[lender][token] += amount;
+                emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
             }
         } else {
             if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
 
             IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-            if (autoRecycleEnabled[lender]) {
+            if (autoRecycleOff[lender]) {
+                IERC20(token).safeTransfer(lender, amount);
+            } else {
                 liquidityPool[lender][token] += amount;
                 emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
-            } else {
-                IERC20(token).safeTransfer(lender, amount);
             }
         }
 
