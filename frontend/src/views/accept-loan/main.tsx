@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { tokens, credLinkThirdWeb } from "../../utils/constants";
 import TokenDropdown from "../../components/TokenDropdown";
 import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
 import { toast } from "react-toastify";
-import { gql, useQuery } from "@apollo/client";
 
 import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
@@ -16,38 +16,38 @@ interface Token {
   image: string;
 }
 
-const GET_LOANS = gql`
-  query MyQuery {
-    lenderLiquidityUpdateds(first: 10, where: { availableAmount_gt: "0" }) {
-      id
-      lender
-      token
-      availableAmount
-    }
-  }
-`;
-
-// {
-//   "data": {
-//     "lenderLiquidityUpdateds": [
-//       {
-//         "id": "0x38dafb5a3f0abe1f4e3f45162b480142aae29d38-0x0000000000000000000000000000000000000000",
-//         "lender": "0x38dafb5a3f0abe1f4e3f45162b480142aae29d38",
-//         "token": "0x0000000000000000000000000000000000000000",
-//         "availableAmount": "1000000000000000"
-//       }
-//     ]
-//   }
-// }
-
 export default function AcceptLoanForm() {
+  const [searchParams] = useSearchParams();
+
   const activeAccount = useActiveAccount(); // Connected user
   const address = activeAccount?.address;
+
+  const lenderFromQuery = searchParams.get("lender") || "";
+  const tokenFromQuery = searchParams.get("token") || "";
+
   const [amount, setAmount] = useState("");
   const [selectedLoanToken, setSelectedLoanToken] = useState<Token>(tokens[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [lender, setLender] = useState<string>("");
+
+  useEffect(() => {
+    if (tokenFromQuery) {
+      const tokenMatch = tokens.find(
+        (t) => t.address.toLowerCase() === tokenFromQuery.toLowerCase()
+      );
+      if (tokenMatch) {
+        setSelectedLoanToken(tokenMatch);
+      }
+    }
+  }, [tokenFromQuery]);
+
+  useEffect(() => {
+    if (lenderFromQuery) {
+      setLender(lenderFromQuery);
+    } else if (address) {
+      setLender(address);
+    }
+  }, [lenderFromQuery, address]);
 
   const { data: collateral, isLoading: collateralLoading } = useReadContract({
     contract: credLinkThirdWeb,
@@ -64,7 +64,7 @@ export default function AcceptLoanForm() {
     method:
       "function liquidityPool(address lender, address token) view returns (uint256)",
     params: [
-      address ?? "0x0000000000000000000000000000000000000000",
+      lender || "0x0000000000000000000000000000000000000000",
       selectedLoanToken.address,
     ],
   });
@@ -107,12 +107,6 @@ export default function AcceptLoanForm() {
       setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (address) {
-      setLender(address); // You can replace this with a custom lender if needed
-    }
-  }, [address]);
 
   return (
     <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 space-y-4">

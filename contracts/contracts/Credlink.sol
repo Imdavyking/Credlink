@@ -2,8 +2,9 @@
 pragma solidity 0.8.28;
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract Credlink is Ownable {
+contract Credlink is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     error Credlink__ZeroAmount();
     error Credlink__ZeroDuration();
@@ -46,6 +47,12 @@ contract Credlink is Ownable {
         address indexed token,
         uint256 availableAmount
     );
+    event LoanBorrowed(
+        address indexed borrower,
+        address indexed lender,
+        address indexed token,
+        uint256 amount
+    );
     event LiquidityWithdrawn(address indexed lender, address indexed token, uint256 amount);
 
     mapping(address => mapping(address => uint256)) public collateral;
@@ -53,6 +60,8 @@ contract Credlink is Ownable {
     mapping(address => mapping(address => uint256)) public liquidityPool;
     mapping(address => Loan[]) public activeLoans;
     mapping(address => bool) public autoRecycleEnabled;
+    mapping(address borrower => mapping(address lender => mapping(address token => uint256 amount)))
+        public debtBorrowerLenderToken;
 
     address public ETHERLINK_TESTNET_USDT = 0xf7f007dc8Cb507e25e8b7dbDa600c07FdCF9A75B;
 
@@ -70,7 +79,11 @@ contract Credlink is Ownable {
         autoRecycleEnabled[msg.sender] = enabled;
     }
 
-    function createLoan(address token, uint256 amount, uint256 duration) external payable {
+    function createLoan(
+        address token,
+        uint256 amount,
+        uint256 duration
+    ) external payable nonReentrant {
         if (amount == 0) revert Credlink__ZeroAmount();
         if (duration == 0) revert Credlink__ZeroDuration();
 
@@ -87,7 +100,10 @@ contract Credlink is Ownable {
         emit LenderLiquidityUpdated(msg.sender, token, liquidityPool[msg.sender][token]);
     }
 
-    function lockCollateral(address collateralToken, uint256 collateralAmount) external payable {
+    function lockCollateral(
+        address collateralToken,
+        uint256 collateralAmount
+    ) external payable nonReentrant {
         if (collateralAmount == 0) revert Credlink__ZeroAmount();
 
         collateral[msg.sender][collateralToken] += collateralAmount;
@@ -100,7 +116,7 @@ contract Credlink is Ownable {
         }
     }
 
-    function acceptLoan(address lender, address token, uint256 amount) external {
+    function acceptLoan(address lender, address token, uint256 amount) external nonReentrant {
         if (amount == 0) revert Credlink__ZeroAmount();
 
         uint256 liquidity = liquidityPool[lender][token];
@@ -112,6 +128,8 @@ contract Credlink is Ownable {
 
         liquidityPool[lender][token] -= amount;
         debt[msg.sender][token] += amount;
+        debtBorrowerLenderToken[msg.sender][lender][token] += amount; // new
+
         activeLoans[msg.sender].push(Loan(lender, token, amount));
 
         if (token == address(0)) {
@@ -122,9 +140,15 @@ contract Credlink is Ownable {
 
         emit LoanAccepted(msg.sender, lender, token, amount, token, currentCollateral);
         emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
+        emit LoanBorrowed(
+            msg.sender,
+            lender,
+            token,
+            debtBorrowerLenderToken[msg.sender][lender][token]
+        );
     }
 
-    function withdrawLiquidity(address token, uint256 amount) external {
+    function withdrawLiquidity(address token, uint256 amount) external nonReentrant {
         uint256 available = liquidityPool[msg.sender][token];
         if (amount == 0 || amount > available) revert Credlink__InsufficientLiquidity();
 
@@ -141,9 +165,20 @@ contract Credlink is Ownable {
         emit LenderLiquidityUpdated(msg.sender, token, liquidityPool[msg.sender][token]);
     }
 
-    function payLoan(address token, address lender, uint256 amount) external payable {
+    function getDebtForBorrowerLenderToken(
+        address borrower,
+        address lender,
+        address token
+    ) external view returns (uint256) {
+        return debtBorrowerLenderToken[borrower][lender][token];
+    }
+
+    function payLoan(address token, address lender, uint256 amount) external payable nonReentrant {
         uint256 currentDebt = debt[msg.sender][token];
         if (currentDebt < amount) revert Credlink__RepaymentExceedsDebt();
+
+        uint256 lenderDebt = debtBorrowerLenderToken[msg.sender][lender][token];
+        if (lenderDebt < amount) revert Credlink__RepaymentExceedsDebt();
 
         // ETH case
         if (token == address(0)) {
@@ -156,12 +191,9 @@ contract Credlink is Ownable {
                 (bool sent, ) = payable(lender).call{value: amount}("");
                 if (!sent) revert Credlink__TransferFailed();
             }
-
-            // ERC20 case
         } else {
             if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
 
-            // Transfer to this contract first
             IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
             if (autoRecycleEnabled[lender]) {
@@ -172,10 +204,13 @@ contract Credlink is Ownable {
             }
         }
 
-        // Update debt
+        // Update debts
         debt[msg.sender][token] -= amount;
+        debtBorrowerLenderToken[msg.sender][lender][token] -= amount;
 
-        // Release collateral if debt is fully repaid
+        // Optional: update activeLoans here too (if you want precise tracking)
+
+        // Release collateral if fully repaid
         if (debt[msg.sender][token] == 0) {
             uint256 colAmount = collateral[msg.sender][token];
             collateral[msg.sender][token] = 0;
@@ -191,9 +226,15 @@ contract Credlink is Ownable {
         }
 
         emit LoanRepaid(msg.sender, lender, token, amount);
+        emit LoanBorrowed(
+            msg.sender,
+            lender,
+            token,
+            debtBorrowerLenderToken[msg.sender][lender][token]
+        );
     }
 
-    function liquidate(address borrower, address token) external {
+    function liquidate(address borrower, address token) external nonReentrant {
         uint256 userDebt = debt[borrower][token];
         if (userDebt == 0) revert Credlink__LoanNotFound();
 
@@ -211,12 +252,12 @@ contract Credlink is Ownable {
         }
     }
 
-    function updateMinCollateralRatio(uint256 newRatio) external onlyOwner {
+    function updateMinCollateralRatio(uint256 newRatio) external onlyOwner nonReentrant {
         if (newRatio < 10000) revert Credlink__InvalidRatio();
         minCollateralRatio = newRatio;
     }
 
-    function setOwner(address newOwner) external onlyOwner {
+    function setOwner(address newOwner) external onlyOwner nonReentrant {
         transferOwnership(newOwner);
     }
 

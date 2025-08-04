@@ -9,7 +9,7 @@ const NavHeader = () => {
 
   const links = [
     { to: "/create-loan", label: "Create" },
-    { to: "/accept-loan", label: "Accept" },
+    { to: "/loan-list", label: "Loans" },
     { to: "/pay-loan", label: "Pay" },
     { to: "/lock-collateral", label: "Lock" },
   ];
@@ -29,7 +29,9 @@ const NavHeader = () => {
   return (
     <header className="p-6 border-b shadow-sm bg-white flex justify-between items-center mb-6 relative">
       <Link to="/">
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-600">CredLink</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-600">
+          CredLink
+        </h1>
       </Link>
 
       {/* Desktop Nav */}

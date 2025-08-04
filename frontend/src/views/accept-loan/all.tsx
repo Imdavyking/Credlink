@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { tokens } from "../../utils/constants";
 
@@ -16,9 +16,6 @@ const GET_LOANS = gql`
       lender
       token
       availableAmount
-    }
-    lenderLiquidityUpdatedsConnection {
-      totalCount
     }
   }
 `;
@@ -103,6 +100,13 @@ export default function LoanList() {
                 {formatAmount(loan.availableAmount)}
               </p>
             </div>
+
+            <Link
+              to={`/accept-loan?lender=${loan.lender}&token=${loan.token}`}
+              className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
+            >
+              Accept Loan
+            </Link>
           </div>
         </div>
       ))}
