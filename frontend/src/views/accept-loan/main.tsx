@@ -24,6 +24,7 @@ export default function AcceptLoanForm() {
 
   const lenderFromQuery = searchParams.get("lender") || "";
   const tokenFromQuery = searchParams.get("token") || "";
+  const amountFromQuery = searchParams.get("amount") || "";
 
   const [amount, setAmount] = useState("");
   const [selectedLoanToken, setSelectedLoanToken] = useState<Token>(tokens[0]);
@@ -40,6 +41,10 @@ export default function AcceptLoanForm() {
       }
     }
   }, [tokenFromQuery]);
+
+  useEffect(() => {
+    if (amountFromQuery) setAmount(`${Number(amountFromQuery) / 10 ** 18}`);
+  }, [amountFromQuery]);
 
   useEffect(() => {
     if (lenderFromQuery) {

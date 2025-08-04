@@ -102,7 +102,7 @@ export default function LoanList() {
             </div>
 
             <Link
-              to={`/accept-loan?lender=${loan.lender}&token=${loan.token}`}
+              to={`/accept-loan?lender=${loan.lender}&token=${loan.token}&amount=${loan.availableAmount}`}
               className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
             >
               Accept Loan

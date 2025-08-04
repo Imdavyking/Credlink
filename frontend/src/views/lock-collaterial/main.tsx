@@ -32,9 +32,6 @@ export default function LockCollateral() {
       address ?? "0x0000000000000000000000000000000000000000",
       selectedToken.address,
     ],
-    value: isNativeTokenAddressCred(selectedToken.address)
-      ? toUnits(amount, 18)
-      : undefined,
   });
 
   const handleLockCollateral = async (e: React.FormEvent) => {
@@ -57,6 +54,9 @@ export default function LockCollateral() {
         contract: credLinkThirdWeb,
         method: "function lockCollateral(address token, uint256 amount)",
         params: [selectedToken.address, toUnits(amount, 18)],
+        value: isNativeTokenAddressCred(selectedToken.address)
+          ? toUnits(amount, 18)
+          : undefined,
       });
 
       await sendAndConfirmTransaction({
