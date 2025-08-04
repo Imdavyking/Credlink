@@ -5,6 +5,7 @@ import CreateLoan from "../views/create-loan/main";
 import AcceptLoanForm from "../views/accept-loan/main";
 import PayLoan from "../views/pay-loan/main";
 import LockCollaterial from "../views/lock-collaterial/main";
+import LoanList from "../views/accept-loan/all";
 function Router() {
   const routes = [
     {
@@ -22,6 +23,10 @@ function Router() {
     {
       path: "/accept-loan",
       element: <AcceptLoanForm />,
+    },
+    {
+      path: "/loan-list",
+      element: <LoanList />,
     },
     {
       path: "/pay-loan",

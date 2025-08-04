@@ -5,6 +5,7 @@ import TextInput from "../../components/TextInput";
 import NumberInput from "../../components/NumberInput";
 import SubmitButton from "../../components/SubmitButton";
 import { toast } from "react-toastify";
+import { gql, useQuery } from "@apollo/client";
 
 import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
@@ -14,6 +15,30 @@ interface Token {
   address: string;
   image: string;
 }
+
+const GET_LOANS = gql`
+  query MyQuery {
+    lenderLiquidityUpdateds(first: 10, where: { availableAmount_gt: "0" }) {
+      id
+      lender
+      token
+      availableAmount
+    }
+  }
+`;
+
+// {
+//   "data": {
+//     "lenderLiquidityUpdateds": [
+//       {
+//         "id": "0x38dafb5a3f0abe1f4e3f45162b480142aae29d38-0x0000000000000000000000000000000000000000",
+//         "lender": "0x38dafb5a3f0abe1f4e3f45162b480142aae29d38",
+//         "token": "0x0000000000000000000000000000000000000000",
+//         "availableAmount": "1000000000000000"
+//       }
+//     ]
+//   }
+// }
 
 export default function AcceptLoanForm() {
   const activeAccount = useActiveAccount(); // Connected user
