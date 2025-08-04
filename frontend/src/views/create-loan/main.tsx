@@ -45,7 +45,7 @@ export default function CreateLoan() {
       return;
     }
 
-    if (!duration || Number(duration) <= 1) {
+    if (!duration || Number(duration) < 1) {
       toast.error("Duration must be at least 1 day");
       return;
     }
