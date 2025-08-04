@@ -18,7 +18,7 @@ contract Credlink is Ownable, ReentrancyGuard {
     error Credlink__LoanNotFound();
     error Credlink__LoanNotEligibleForLiquidation();
     error Credlink__InsufficientTransferredValue();
-    error Credlink__YouShouldNotSendEth();
+    error Credlink__YouShouldNotSendXTZ();
     error Credlink__PaymentMismatch();
     error Credlink__RepaymentExceedsDebt();
 
@@ -63,7 +63,7 @@ contract Credlink is Ownable, ReentrancyGuard {
     mapping(address borrower => mapping(address lender => mapping(address token => uint256 amount)))
         public debtBorrowerLenderToken;
 
-    address public ETHERLINK_TESTNET_USDT = 0xf7f007dc8Cb507e25e8b7dbDa600c07FdCF9A75B;
+    address public XTZERLINK_TESTNET_USDT = 0xf7f007dc8Cb507e25e8b7dbDa600c07FdCF9A75B;
 
     uint256 public minCollateralRatio = 15000; // 150% in basis points
 
@@ -92,7 +92,7 @@ contract Credlink is Ownable, ReentrancyGuard {
         if (token == address(0)) {
             if (msg.value != amount) revert Credlink__InsufficientTransferredValue();
         } else {
-            if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
+            if (msg.value != 0) revert Credlink__YouShouldNotSendXTZ();
             IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
         }
 
@@ -111,7 +111,7 @@ contract Credlink is Ownable, ReentrancyGuard {
         if (collateralToken == address(0)) {
             if (msg.value != collateralAmount) revert Credlink__InsufficientTransferredValue();
         } else {
-            if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
+            if (msg.value != 0) revert Credlink__YouShouldNotSendXTZ();
             IERC20(collateralToken).safeTransferFrom(msg.sender, address(this), collateralAmount);
         }
     }
@@ -180,7 +180,7 @@ contract Credlink is Ownable, ReentrancyGuard {
         uint256 lenderDebt = debtBorrowerLenderToken[msg.sender][lender][token];
         if (lenderDebt < amount) revert Credlink__RepaymentExceedsDebt();
 
-        // ETH case
+        // XTZ case
         if (token == address(0)) {
             if (msg.value != amount) revert Credlink__PaymentMismatch();
 
@@ -192,7 +192,7 @@ contract Credlink is Ownable, ReentrancyGuard {
                 emit LenderLiquidityUpdated(lender, token, liquidityPool[lender][token]);
             }
         } else {
-            if (msg.value != 0) revert Credlink__YouShouldNotSendEth();
+            if (msg.value != 0) revert Credlink__YouShouldNotSendXTZ();
 
             IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 

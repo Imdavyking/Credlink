@@ -1,7 +1,7 @@
 {
   "network": "etherlink-testnet",
-  "address": "0xd13B462Db24e2546CEe500Dcc109e3C92c22277b",
-  "startBlock": 20904009,
+  "address": "0xde3896787b9B514b5B8143961BAffbFBB678bB90",
+  "startBlock": 20907140,
   "file": "credlink",
   "lenderLiquidityUpdateEvent": "LenderLiquidityUpdated(indexed address,indexed address,uint256)",
   "loanBorrowedEvent": "LoanBorrowed(indexed address,indexed address,indexed address,uint256)"
