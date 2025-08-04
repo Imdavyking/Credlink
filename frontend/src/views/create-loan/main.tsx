@@ -62,7 +62,11 @@ export default function CreateLoan() {
         contract: credLinkThirdWeb,
         method:
           "function createLoan(address token, uint256 amount, uint256 duration)",
-        params: [selectedToken.address, toUnits(amount, 18), BigInt(duration)],
+        params: [
+          selectedToken.address,
+          toUnits(amount, 18),
+          BigInt(Math.trunc(Number(duration) * 24 * 60 * 60)),
+        ],
         value: isNativeTokenAddressCred(selectedToken.address)
           ? toUnits(amount, 18)
           : undefined,
@@ -106,8 +110,8 @@ export default function CreateLoan() {
         <NumberInput
           defaultValue={duration}
           onChange={setDuration}
-          label="Duration (in seconds)"
-          placeholder="e.g., 604800"
+          label="Duration (in days)"
+          placeholder="e.g., 30"
         />
 
         <NumberInput
