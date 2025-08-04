@@ -2,15 +2,16 @@ import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { tokens } from "../../utils/constants";
+import { useActiveAccount } from "thirdweb/react";
 
 const PAGE_SIZE = 10;
 
 const GET_LOANS = gql`
-  query GetLoans($first: Int!, $skip: Int!) {
+  query GetLoans($first: Int!, $skip: Int!, $address: String!) {
     loanBorroweds(
       first: $first
       skip: $skip
-      where: { amount_gt: "0" }
+      where: { amount_gt: "0", borrower: $address }
     ) {
       id
       borrower
@@ -38,12 +39,15 @@ function formatAmount(amount: string) {
 }
 
 export default function BorrowerLoanList() {
+  const activeAccount = useActiveAccount();
+  const address = activeAccount?.address || "";
+
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
   const offset = (page - 1) * PAGE_SIZE;
 
   const { loading, error, data, refetch } = useQuery(GET_LOANS, {
-    variables: { first: PAGE_SIZE, skip: offset },
+    variables: { first: PAGE_SIZE, skip: offset, address },
     fetchPolicy: "cache-and-network",
   });
 
